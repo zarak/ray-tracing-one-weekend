@@ -47,7 +47,8 @@ test-suite ray-tracing-one-weekend-test
     -- other-extensions:
     type:             exitcode-stdio-1.0
     hs-source-dirs:   test
-    main-is:          Main.hs
+    main-is:          Spec.hs
     build-depends:
         base ^>=4.16.4.0,
-        ray-tracing-one-weekend
+        ray-tracing-one-weekend,
+        hspec

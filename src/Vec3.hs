@@ -11,7 +11,7 @@ data Vec3 = Vec3
     y :: Double,
     z :: Double
   }
-  deriving (Show)
+  deriving (Show, Eq)
 
 zeros :: Vec3
 zeros = Vec3 0 0 0
