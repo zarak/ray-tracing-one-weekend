@@ -7,6 +7,8 @@ type TMin = Double
 
 type TMax = Double
 
+type Root = Double
+
 data HitRecord = HitRecord
   { p :: Point,
     normal :: Vec3,
@@ -14,4 +16,4 @@ data HitRecord = HitRecord
   }
 
 class Hittable a where
-  hit :: a -> Ray -> TMin -> TMax -> HitRecord -> Bool
+  hit :: a -> Ray -> TMin -> TMax -> HitRecord -> Maybe HitRecord

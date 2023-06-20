@@ -22,6 +22,8 @@ library
                     , Vec3
                     , Color
                     , Ray
+                    , Hittable
+                    , Sphere
                     , RtWeekend
     -- other-modules:
     default-extensions: OverloadedRecordDot
