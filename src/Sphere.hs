@@ -10,11 +10,25 @@ data Sphere = Sphere
   }
 
 instance Hittable Sphere where
-  hit sphere r tmin tmax hitRecord =
+  hit sphere r tmin tmax = do
     let oc = sphere.center |-> r.base
         a = dot r.direction r.direction
         halfB = dot oc r.direction
         c = lengthSquared oc - sphere.radius * sphere.radius
         discriminant = halfB * halfB - a * c
         sqrtd = sqrt discriminant
-     in _todo
+    root <- findNearestRoot halfB sqrtd a tmin tmax
+    let t = root
+        p = Point $ r `at` t
+        normal = (sphere.center |-> p) ^/ sphere.radius
+    pure $ HitRecord p normal t
+
+findNearestRoot :: Double -> Double -> Double -> Double -> Double -> Maybe Root
+findNearestRoot halfB sqrtd a tmin tmax
+  | noRoots = Nothing
+  | root1 < tmin || tmax < root1 = pure root2
+  | otherwise = Nothing
+  where
+    root1 = (-halfB - sqrtd) / a
+    root2 = (-halfB + sqrtd) / a
+    noRoots = (root1 < tmin || tmax < root1) && (root2 < tmin || tmax < root2)

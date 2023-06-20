@@ -16,4 +16,4 @@ data HitRecord = HitRecord
   }
 
 class Hittable a where
-  hit :: a -> Ray -> TMin -> TMax -> HitRecord -> Maybe HitRecord
+  hit :: a -> Ray -> TMin -> TMax -> Maybe HitRecord
