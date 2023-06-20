@@ -25,10 +25,12 @@ instance Hittable Sphere where
 
 findNearestRoot :: Double -> Double -> Double -> Double -> Double -> Maybe Root
 findNearestRoot halfB sqrtd a tmin tmax
+  | rootInRange root1 = pure root1
+  | not (rootInRange root1) && rootInRange root2 = pure root2
   | noRoots = Nothing
-  | root1 < tmin || tmax < root1 = pure root2
   | otherwise = Nothing
   where
     root1 = (-halfB - sqrtd) / a
     root2 = (-halfB + sqrtd) / a
-    noRoots = (root1 < tmin || tmax < root1) && (root2 < tmin || tmax < root2)
+    rootInRange root = tmin < root && root < tmax
+    noRoots = not (rootInRange root1 || rootInRange root2)

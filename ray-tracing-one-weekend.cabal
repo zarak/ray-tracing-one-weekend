@@ -48,6 +48,7 @@ test-suite ray-tracing-one-weekend-test
     import:           warnings
     default-language: GHC2021
     other-modules:    Vec3Spec
+                    , SphereSpec
     -- other-extensions:
     type:             exitcode-stdio-1.0
     hs-source-dirs:   test
