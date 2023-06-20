@@ -29,6 +29,7 @@ rayColor r =
         then color 1 0 0
         else Color $ (1.0 - t) *^ white.toVec3 + t *^ blue.toVec3
 
+-- Generate the line of a PPM format image
 generateLine :: Int -> IO ()
 generateLine j = do
   putStrLn $
@@ -44,7 +45,7 @@ drawRay i j =
       pixelColor = rayColor r
    in pixelColor
 
--- function to generate image and display progress
+-- Generate image (without header) and display progress
 generateImage :: Int -> IO ()
 generateImage 0 = do
   hPutStr stderr "\rScanlines remaining: 0 \nDone.\n"
@@ -55,6 +56,7 @@ generateImage j = do
   generateLine j
   generateImage (j - 1)
 
+-- Generate image with header
 someFunc :: IO ()
 someFunc = do
   putStrLn $ printf "P3\n%d %d\n255" imageWidth imageHeight

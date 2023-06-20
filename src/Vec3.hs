@@ -9,20 +9,12 @@ newtype Point = Point
   }
   deriving (Show)
 
-newtype Color = Color
-  { toVec3 :: Vec3
-  }
-  deriving (Show)
-
 data Vec3 = Vec3
   { x :: Double,
     y :: Double,
     z :: Double
   }
   deriving (Show, Eq)
-
-color :: Double -> Double -> Double -> Color
-color a b c = Color $ Vec3 a b c
 
 point :: Double -> Double -> Double -> Point
 point a b c = Point $ Vec3 a b c
