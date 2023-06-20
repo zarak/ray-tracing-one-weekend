@@ -2,6 +2,7 @@
 
 module Camera where
 
+import Ray
 import Vec3
 
 data Camera = Camera
@@ -53,3 +54,15 @@ defaultCamera =
           - defaultVertical ^/ 2
           - Vec3 0 0 defaultFocalLength
     }
+
+getRay :: Double -> Double -> Ray
+getRay u v =
+  Ray
+    defaultCamera.origin
+    ( defaultCamera.lowerLeftCorner
+        + u
+        *^ defaultCamera.horizontal
+        + v
+        *^ defaultCamera.vertical
+        - defaultCamera.origin.toVec3
+    )
