@@ -14,12 +14,12 @@ hitSphere :: Point -> Radius -> Ray -> Double
 hitSphere center radius r =
   let oc = center |-> r.base
       a = dot r.direction r.direction
-      b = 2.0 * dot oc r.direction
-      c = dot oc oc - radius * radius
-      discriminant = b * b - 4 * a * c
+      halfB = dot oc r.direction
+      c = lengthSquared oc - radius * radius
+      discriminant = halfB * halfB - a * c
    in if discriminant < 0
         then -1.0
-        else (-b - sqrt discriminant) / (2.0 * a)
+        else (-halfB - sqrt discriminant) / a
 
 rayColor :: Ray -> Color
 rayColor r =
