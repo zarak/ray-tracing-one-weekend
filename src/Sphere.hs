@@ -34,16 +34,20 @@ findNearestRoot halfB sqrtd a (tmin, tmax)
     root2 = (-halfB + sqrtd) / a
     rootInRange root = tmin < root && root < tmax
 
-newtype HittableList a = HittableList [a]
+newtype World a = World [a]
 
-instance Hittable a => Hittable (HittableList a) where
-  hit (HittableList []) _ _ = Nothing
-  hit (HittableList (h : hs)) ray range =
+instance Hittable a => Hittable (World a) where
+  hit (World []) _ _ = Nothing
+  hit (World (h : hs)) ray range =
     case hit h ray range of
-      Nothing -> hit (HittableList hs) ray range
-      mFirstHit@(Just hitRecord) ->
+      -- If there are no hits on this object, check the rest of the objects in
+      -- the world with the same range
+      Nothing -> hit (World hs) ray range
+      -- If there is a hit, reduce the range and check the remaining objects to
+      -- see if a ray hits a closer object
+      mHitRecord@(Just hitRecord) ->
         let (tmin, _) = range
          in maybe
-              mFirstHit
+              mHitRecord
               pure
-              (hit (HittableList hs) ray (tmin, hitRecord.t))
+              (hit (World hs) ray (tmin, hitRecord.t))
