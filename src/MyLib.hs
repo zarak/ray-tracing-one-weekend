@@ -20,7 +20,6 @@ outputPixel (r, g, b) = printf "%d %d %d" (scaleColor r) (scaleColor g) (scaleCo
     scaleColor :: Double -> Int
     scaleColor color = truncate (255.999 * color)
 
--- generate each line of the image
 generateLine :: Int -> IO ()
 generateLine j = do
   let g = scale imageHeight j
@@ -29,18 +28,17 @@ generateLine j = do
       [ outputPixel (r, g, 0.25) | i <- [0 .. imageWidth - 1], let r = scale imageWidth i
       ]
 
--- recursive function to generate image and display progress
+-- function to generate image and display progress
 generateImage :: Int -> IO ()
 generateImage 0 = do
   hPutStr stderr "\rScanlines remaining: 0 \nDone.\n"
   hFlush stderr
 generateImage j = do
-  hPutStr stderr ("\rScanlines remaining: " ++ show j ++ " ")
+  hPutStr stderr ("\rScanlines remaining: " ++ show j ++ "\n")
   hFlush stderr
   generateLine j
   generateImage (j - 1)
 
--- image generation
 someFunc :: IO ()
 someFunc = do
   putStrLn $ printf "P3\n%d %d\n255" imageWidth imageHeight
