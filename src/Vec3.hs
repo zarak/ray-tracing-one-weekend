@@ -34,7 +34,17 @@ lengthSquared :: Vec3 -> Double
 lengthSquared v = v.x * v.x + v.y * v.y + v.z * v.z
 
 scale :: Double -> Vec3 -> Vec3
-scale t v = Vec3 (t * v.x) (t * v.y) (t * v.z)
+scale t (Vec3 x y z) = Vec3 (t * x) (t * y) (t * z)
+
+(*^) :: Double -> Vec3 -> Vec3
+t *^ v = scale t v
+
+infixr 7 *^
+
+(^*) :: Vec3 -> Double -> Vec3
+(^*) = flip scale
+
+infixl 7 ^*
 
 scaleDiv :: Vec3 -> Double -> Vec3
 scaleDiv (Vec3 x y z) s = Vec3 (x / s) (y / s) (z / s)
