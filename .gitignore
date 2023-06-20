@@ -1,4 +1,5 @@
 ### https://raw.github.com/github/gitignore/991e760c1c6d50fdda246e0178b9c58b06770b90/Haskell.gitignore
+*.ppm
 
 dist
 dist-*
