@@ -25,6 +25,7 @@ library
                     , Hittable
                     , Sphere
                     , RtWeekend
+                    , Camera
     -- other-modules:
     default-extensions: OverloadedRecordDot
                       , NegativeLiterals

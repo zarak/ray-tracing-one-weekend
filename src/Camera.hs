@@ -1,35 +1,55 @@
+{-# LANGUAGE DuplicateRecordFields #-}
+
 module Camera where
 
-import Color
 import Vec3
 
-aspectRatio :: Double
-aspectRatio = 16.0 / 9.0
+data Camera = Camera
+  { aspectRatio :: Double,
+    viewportHeight :: Double,
+    viewportWidth :: Double,
+    focalLength :: Double,
+    origin :: Point,
+    horizontal :: Vec3,
+    vertical :: Vec3,
+    lowerLeftCorner :: Vec3
+  }
+  deriving (Show)
 
-viewportHeight :: Double
-viewportHeight = 2.0
+defaultViewportWidth :: Double
+defaultViewportWidth = defaultAspectRatio * defaultViewportHeight
 
-viewportWidth :: Double
-viewportWidth = aspectRatio * viewportHeight
+defaultViewportHeight :: Double
+defaultViewportHeight = 2.0
 
-focalLength :: Double
-focalLength = 1.0
+defaultAspectRatio :: Double
+defaultAspectRatio = 16.0 / 9.0
 
-origin :: Point
-origin = Point zeros
+defaultHorizontal :: Vec3
+defaultHorizontal = Vec3 defaultViewportWidth 0 0
 
-black :: Color
-black = color 0 0 0
+defaultVertical :: Vec3
+defaultVertical = Vec3 0 defaultViewportHeight 0
 
-horizontal :: Vec3
-horizontal = Vec3 viewportWidth 0 0
+defaultFocalLength :: Double
+defaultFocalLength = 1.0
 
-vertical :: Vec3
-vertical = Vec3 0 viewportHeight 0
+defaultOrigin :: Point
+defaultOrigin = Point zeros
 
-lowerLeftCorner :: Vec3
-lowerLeftCorner =
-  origin.toVec3
-    - horizontal ^/ 2
-    - vertical ^/ 2
-    - Vec3 0 0 focalLength
+defaultCamera :: Camera
+defaultCamera =
+  Camera
+    { aspectRatio = defaultAspectRatio,
+      viewportHeight = defaultViewportHeight,
+      viewportWidth = defaultViewportWidth,
+      focalLength = defaultFocalLength,
+      origin = defaultOrigin,
+      horizontal = defaultHorizontal,
+      vertical = defaultVertical,
+      lowerLeftCorner =
+        defaultOrigin.toVec3
+          - defaultHorizontal ^/ 2
+          - defaultVertical ^/ 2
+          - Vec3 0 0 defaultFocalLength
+    }
