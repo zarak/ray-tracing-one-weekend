@@ -1,7 +1,7 @@
 module Vec3Spec (spec) where
 
 import Test.Hspec
-import Vec3 (Vec3 (..), cross, dot, scaleDiv, scaleVec3, unitVector)
+import Vec3 (Vec3 (..), cross, dot, scale, scaleDiv, unitVector)
 
 spec :: Spec
 spec = do
@@ -16,7 +16,7 @@ spec = do
       Vec3 1 2 3 * Vec3 4 5 6 `shouldBe` Vec3 4 10 18
 
     it "should scale vectors correctly" $ do
-      scaleVec3 2 (Vec3 1 2 3) `shouldBe` Vec3 2 4 6
+      scale 2 (Vec3 1 2 3) `shouldBe` Vec3 2 4 6
 
     it "should divide vectors by scalar correctly" $ do
       scaleDiv (Vec3 2 4 6) 2 `shouldBe` Vec3 1 2 3

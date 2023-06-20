@@ -1,10 +1,18 @@
+{-# LANGUAGE DuplicateRecordFields #-}
+
 module Vec3 where
 
 import Prelude hiding (length)
 
-newtype Point = Point Vec3 deriving (Show)
+newtype Point = Point
+  { toVec3 :: Vec3
+  }
+  deriving (Show)
 
-newtype Color = Color Vec3 deriving (Show)
+newtype Color = Color
+  { toVec3 :: Vec3
+  }
+  deriving (Show)
 
 data Vec3 = Vec3
   { x :: Double,
@@ -55,7 +63,7 @@ v ^/ t = scaleDiv v t
 infixl 7 ^/
 
 unitVector :: Vec3 -> Vec3
-unitVector v = scaleDiv v (length v)
+unitVector v = v ^/ length v
 
 dot :: Vec3 -> Vec3 -> Double
 dot (Vec3 x1 y1 z1) (Vec3 x2 y2 z2) = x1 * x2 + y1 * y2 + z1 * z2
