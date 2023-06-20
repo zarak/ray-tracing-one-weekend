@@ -1,7 +1,7 @@
 module Vec3Spec (spec) where
 
 import Test.Hspec
-import Vec3 (Vec3 (..), cross, dot, scaleDiv, scaleVec3, unitVector)
+import Vec3 (Vec3 (..), cross, dot, scaleDiv, scaleVec3, unitToInterval, unitVector)
 
 spec :: Spec
 spec = do
@@ -34,3 +34,9 @@ spec = do
       let v = Vec3 1 2 3
       let len = sqrt (dot v v)
       unitVector v `shouldBe` scaleDiv v len
+  describe "unitToInterval" $ do
+    it "maps (-1, -1, -1) to (0, 0, 0)" $
+      unitToInterval (Vec3 (-1) (-1) (-1)) `shouldBe` Vec3 0 0 0
+
+    it "maps (1, 1, 1) to (1, 1, 1)" $
+      unitToInterval (Vec3 1 1 1) `shouldBe` Vec3 1 1 1

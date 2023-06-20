@@ -10,25 +10,33 @@ import Vec3
 type Radius = Double
 
 -- oc: vector from the center of the circle to the base of the ray
-hitSphere :: Point -> Radius -> Ray -> Bool
+hitSphere :: Point -> Radius -> Ray -> Double
 hitSphere center radius r =
   let oc = center |-> r.base
       a = dot r.direction r.direction
       b = 2.0 * dot oc r.direction
       c = dot oc oc - radius * radius
       discriminant = b * b - 4 * a * c
-   in discriminant > 0
+   in if discriminant < 0
+        then -1.0
+        else (-b - sqrt discriminant) / (2.0 * a)
 
 rayColor :: Ray -> Color
 rayColor r =
   let unitDirection = unitVector r.direction
-      t = 0.5 * unitDirection.y + 1.0
+      -- Compute the parameter t if the ray misses the sphere
+      missT = 0.5 * unitDirection.y + 1.0
       blue = color 0.5 0.7 1.0
       circleCenter = point 0 0 -1
       circleRadius = 0.5
-   in if hitSphere circleCenter circleRadius r
-        then color 1 0 0
-        else Color $ (1.0 - t) *^ white.toVec3 + t *^ blue.toVec3
+      -- The parameter t if the ray hits the sphere
+      hitT = hitSphere circleCenter circleRadius r
+      -- Find the point where the ray hits r, and make a unit normal pointing
+      -- directlly away from the center of the sphere.
+      n = unitVector $ circleCenter |-> Point (r `at` hitT)
+   in if hitT > 0.0
+        then Color $ unitToInterval n
+        else Color $ (1.0 - missT) *^ white.toVec3 + missT *^ blue.toVec3
 
 -- Generate the line of a PPM format image
 generateLine :: Int -> IO ()

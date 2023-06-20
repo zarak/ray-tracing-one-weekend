@@ -77,3 +77,7 @@ dot (Vec3 x1 y1 z1) (Vec3 x2 y2 z2) = x1 * x2 + y1 * y2 + z1 * z2
 
 cross :: Vec3 -> Vec3 -> Vec3
 cross (Vec3 x1 y1 z1) (Vec3 x2 y2 z2) = Vec3 (y1 * z2 - z1 * y2) (z1 * x2 - x1 * z2) (x1 * y2 - y1 * x2)
+
+-- Map a vector of unit length to one with components in the range 0 to 1.
+unitToInterval :: Vec3 -> Vec3
+unitToInterval v = (1 + v) ^/ 2
