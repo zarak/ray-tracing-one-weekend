@@ -1,42 +1,23 @@
 module MyLib (someFunc) where
 
 import Color (Color (..), color, writeColor)
+import GHC.Real (infinity)
+import Hittable
 import Ray
 import RtWeekend
 import System.IO (hFlush, hPutStr, stderr)
 import Text.Printf
 import Vec3
 
-type Radius = Double
-
--- oc: vector from the center of the circle to the base of the ray
-hitSphere :: Point -> Radius -> Ray -> Double
-hitSphere center radius r =
-  let oc = center |-> r.base
-      a = dot r.direction r.direction
-      halfB = dot oc r.direction
-      c = lengthSquared oc - radius * radius
-      discriminant = halfB * halfB - a * c
-   in if discriminant < 0
-        then -1.0
-        else (-halfB - sqrt discriminant) / a
-
-rayColor :: Ray -> Color
-rayColor r =
+rayColor :: Hittable a => Ray -> a -> Color
+rayColor r hittable =
   let unitDirection = unitVector r.direction
-      -- Compute the parameter t if the ray misses the sphere
+      -- Compute the parameter t if the ray misses the object
       missT = 0.5 * unitDirection.y + 1.0
       blue = color 0.5 0.7 1.0
-      circleCenter = point 0 0 -1
-      circleRadius = 0.5
-      -- The parameter t if the ray hits the sphere
-      hitT = hitSphere circleCenter circleRadius r
-      -- Find the point where the ray hits r, and make a unit normal pointing
-      -- directlly away from the center of the sphere.
-      n = unitVector $ circleCenter |-> Point (r `at` hitT)
-   in if hitT > 0.0
-        then Color $ unitToInterval n
-        else Color $ (1.0 - missT) *^ white.toVec3 + missT *^ blue.toVec3
+   in case hit hittable r 0 (fromRational infinity) of
+        Nothing -> Color $ (1.0 - missT) *^ white.toVec3 + missT *^ blue.toVec3
+        Just hitRecord -> Color $ unitToInterval hitRecord.normal
 
 -- Generate the line of a PPM format image
 generateLine :: Int -> IO ()
