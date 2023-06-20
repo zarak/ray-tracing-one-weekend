@@ -19,6 +19,8 @@ common warnings
 library
     import:           warnings
     exposed-modules:  MyLib
+                    , Vec3
+                    , Color
     -- other-modules:
     default-extensions: OverloadedRecordDot
     build-depends:    base ^>=4.16.4.0

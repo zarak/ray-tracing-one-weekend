@@ -1,5 +1,6 @@
 module MyLib (someFunc) where
 
+import Color (writeColor)
 import System.IO (hFlush, hPutStr, stderr)
 import Text.Printf
 
@@ -13,19 +14,12 @@ imageHeight = 256
 scale :: Int -> Int -> Double
 scale maxVal val = fromIntegral val / fromIntegral (maxVal - 1)
 
--- output RGB values scaled to [0,255]
-outputPixel :: (Double, Double, Double) -> String
-outputPixel (r, g, b) = printf "%d %d %d" (scaleColor r) (scaleColor g) (scaleColor b)
-  where
-    scaleColor :: Double -> Int
-    scaleColor color = truncate (255.999 * color)
-
 generateLine :: Int -> IO ()
 generateLine j = do
   let g = scale imageHeight j
   putStrLn $
     unlines
-      [ outputPixel (r, g, 0.25) | i <- [0 .. imageWidth - 1], let r = scale imageWidth i
+      [ writeColor (r, g, 0.25) | i <- [0 .. imageWidth - 1], let r = scale imageWidth i
       ]
 
 -- function to generate image and display progress
