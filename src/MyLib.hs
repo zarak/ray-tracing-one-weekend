@@ -59,6 +59,7 @@ someFunc :: IO ()
 someFunc = do
   let sphere1 = Sphere (point 0 0 -1) 0.5
       sphere2 = Sphere (point 0 -100.5 -1) 100
+      -- sphere3 = Sphere (point 0 100.5 -1) 100
       world = [sphere1, sphere2]
   putStrLn $ printf "P3\n%d %d\n255" imageWidth imageHeight
   generateImage world imageHeight

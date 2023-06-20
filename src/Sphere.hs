@@ -33,3 +33,17 @@ findNearestRoot halfB sqrtd a (tmin, tmax)
     root1 = (-halfB - sqrtd) / a
     root2 = (-halfB + sqrtd) / a
     rootInRange root = tmin < root && root < tmax
+
+newtype HittableList a = HittableList [a]
+
+instance Hittable a => Hittable (HittableList a) where
+  hit (HittableList []) _ _ = Nothing
+  hit (HittableList (h : hs)) ray range =
+    case hit h ray range of
+      Nothing -> hit (HittableList hs) ray range
+      mFirstHit@(Just hitRecord) ->
+        let (tmin, _) = range
+         in maybe
+              mFirstHit
+              pure
+              (hit (HittableList hs) ray (tmin, hitRecord.t))
