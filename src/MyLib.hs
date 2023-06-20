@@ -1,14 +1,18 @@
 module MyLib (someFunc) where
 
 import Color (writeColor)
+import Ray
+import RtWeekend
 import System.IO (hFlush, hPutStr, stderr)
 import Text.Printf
+import Vec3
 
-imageWidth :: Int
-imageWidth = 256
-
-imageHeight :: Int
-imageHeight = 256
+rayColor :: Ray -> Color
+rayColor r =
+  let unitDirection = unitVector r.direction
+      t = 0.5 * unitDirection.y + 1.0
+      blue = color 0.5 0.7 1.0
+   in Color $ (1.0 - t) *^ white.toVec3 + t *^ blue.toVec3
 
 -- scaling function to map from [0,width] or [0,height] to [0,1]
 scale :: Int -> Int -> Double

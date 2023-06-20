@@ -21,6 +21,12 @@ data Vec3 = Vec3
   }
   deriving (Show, Eq)
 
+color :: Double -> Double -> Double -> Color
+color a b c = Color $ Vec3 a b c
+
+point :: Double -> Double -> Double -> Point
+point a b c = Point $ Vec3 a b c
+
 zeros :: Vec3
 zeros = Vec3 0 0 0
 
@@ -41,16 +47,16 @@ length = sqrt . lengthSquared
 lengthSquared :: Vec3 -> Double
 lengthSquared v = v.x * v.x + v.y * v.y + v.z * v.z
 
-scale :: Double -> Vec3 -> Vec3
-scale t (Vec3 x y z) = Vec3 (t * x) (t * y) (t * z)
+scaleVec3 :: Double -> Vec3 -> Vec3
+scaleVec3 t (Vec3 x y z) = Vec3 (t * x) (t * y) (t * z)
 
 (*^) :: Double -> Vec3 -> Vec3
-t *^ v = scale t v
+t *^ v = scaleVec3 t v
 
 infixr 7 *^
 
 (^*) :: Vec3 -> Double -> Vec3
-(^*) = flip scale
+(^*) = flip scaleVec3
 
 infixl 7 ^*
 
@@ -70,6 +76,3 @@ dot (Vec3 x1 y1 z1) (Vec3 x2 y2 z2) = x1 * x2 + y1 * y2 + z1 * z2
 
 cross :: Vec3 -> Vec3 -> Vec3
 cross (Vec3 x1 y1 z1) (Vec3 x2 y2 z2) = Vec3 (y1 * z2 - z1 * y2) (z1 * x2 - x1 * z2) (x1 * y2 - y1 * x2)
-
-scaleVec3 :: Double -> Vec3 -> Vec3
-scaleVec3 s (Vec3 x y z) = Vec3 (s * x) (s * y) (s * z)
