@@ -1,5 +1,6 @@
 module MyLib (someFunc) where
 
+import Camera
 import Color (Color (..), color, writeColor)
 import GHC.Real (infinity)
 import Hittable
