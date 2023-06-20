@@ -20,8 +20,9 @@ instance Hittable Sphere where
     root <- findNearestRoot halfB sqrtd a tmin tmax
     let t = root
         p = Point $ r `at` t
-        normal = (sphere.center |-> p) ^/ sphere.radius
-    pure $ HitRecord p normal t
+        outwardNormal = (sphere.center |-> p) ^/ sphere.radius
+        (face, newNormal) = setFaceNormal r outwardNormal
+    pure $ HitRecord {p = p, t = t, normal = newNormal, face = face}
 
 findNearestRoot :: Double -> Double -> Double -> Double -> Double -> Maybe Root
 findNearestRoot halfB sqrtd a tmin tmax

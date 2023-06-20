@@ -48,3 +48,9 @@ lowerLeftCorner =
     - horizontal ^/ 2
     - vertical ^/ 2
     - Vec3 0 0 focalLength
+
+------------------------------------------------------------------------------
+-- Utility
+------------------------------------------------------------------------------
+degreesToRadians :: Double -> Double
+degreesToRadians deg = deg * pi / 180
