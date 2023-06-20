@@ -43,7 +43,7 @@ executable ray-tracing-one-weekend
 test-suite ray-tracing-one-weekend-test
     import:           warnings
     default-language: GHC2021
-    -- other-modules:
+    other-modules:    Vec3Spec
     -- other-extensions:
     type:             exitcode-stdio-1.0
     hs-source-dirs:   test
