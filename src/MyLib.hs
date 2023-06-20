@@ -1,6 +1,6 @@
 module MyLib (someFunc) where
 
-import Color (writeColor)
+import Color (Color (..), color, writeColor)
 import Ray
 import RtWeekend
 import System.IO (hFlush, hPutStr, stderr)
@@ -9,6 +9,7 @@ import Vec3
 
 type Radius = Double
 
+-- oc: vector from the center of the circle to the base of the ray
 hitSphere :: Point -> Radius -> Ray -> Bool
 hitSphere center radius r =
   let oc = r.base.toVec3 - center.toVec3

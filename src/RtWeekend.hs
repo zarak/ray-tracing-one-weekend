@@ -1,5 +1,6 @@
 module RtWeekend where
 
+import Color
 import Vec3
 
 ------------------------------------------------------------------------------
