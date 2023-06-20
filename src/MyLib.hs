@@ -1,7 +1,7 @@
 module MyLib (someFunc) where
 
 import Camera
-import Color (Color (..), color, writeColor)
+import Color (Color (..), color, white, writeColor)
 import GHC.Real (infinity)
 import Hittable
 import Ray
@@ -10,6 +10,9 @@ import Sphere
 import System.IO (hFlush, hPutStr, stderr)
 import Text.Printf
 import Vec3
+
+samplesPerPixel :: Int
+samplesPerPixel = 100
 
 world :: World Sphere
 world =
@@ -33,14 +36,14 @@ generateLine :: Int -> IO ()
 generateLine j = do
   putStrLn $
     unlines
-      [ writeColor c | i <- [0 .. imageWidth - 1], let c = drawRay i j
+      [ writeColor c samplesPerPixel | i <- [0 .. imageWidth - 1], let c = drawRay i j
       ]
 
 drawRay :: Int -> Int -> Color
 drawRay i j =
   let u = fromIntegral i / fromIntegral (imageWidth - 1)
       v = fromIntegral j / fromIntegral (imageHeight - 1)
-      r = Ray origin (lowerLeftCorner + u *^ horizontal + v *^ vertical - origin.toVec3)
+      r = getRay u v
       pixelColor = rayColor r
    in pixelColor
 

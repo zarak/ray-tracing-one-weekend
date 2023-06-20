@@ -30,8 +30,8 @@ color a b c = Color $ Vec3 a b c
 --     scaleColor :: Double -> Int
 --     scaleColor color' = truncate (255.999 * color')
 
-writeColor :: Vec3 -> Int -> String
-writeColor (Vec3 r g b) samplesPerPixel =
+writeColor :: Color -> Int -> String
+writeColor (Color (Vec3 r g b)) samplesPerPixel =
   let scale = 1.0 / fromIntegral samplesPerPixel
       r' = r * scale
       g' = g * scale
