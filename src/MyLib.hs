@@ -1,29 +1,30 @@
 module MyLib (someFunc) where
 
 import Data.Foldable (traverse_)
+import Text.Printf
 
-imageWidth :: Double
+imageWidth :: Int
 imageWidth = 256
 
-imageHeight :: Double
+imageHeight :: Int
 imageHeight = 256
 
+-- scaling function to map from [0,width] or [0,height] to [0,1]
+scale :: Int -> Int -> Double
+scale maxVal val = fromIntegral val / fromIntegral (maxVal - 1)
+
+-- output RGB values scaled to [0,255]
+outputPixel :: (Double, Double, Double) -> String
+outputPixel (r, g, b) = printf "%d %d %d" (scaleColor r) (scaleColor g) (scaleColor b)
+  where
+    scaleColor :: Double -> Int
+    scaleColor color = truncate (255.999 * color)
+
+-- image generation
 someFunc :: IO ()
 someFunc = do
-  putStrLn $ "P3\n" <> show imageWidth <> " " <> show imageHeight <> "\n255"
-  traverse_ (\(ir, ig, ib) -> printFunc ir ig ib) genVals
-
-printFunc :: Integer -> Integer -> Integer -> IO ()
-printFunc ir ig ib = do
-  putStrLn $ show ir <> " " <> show ig <> " " <> show ib
-
-genVals :: [(Integer, Integer, Integer)]
-genVals =
-  let vals =
-        [ [ ((255.999 * i) / (imageWidth - 1), 255.999 * j / (imageHeight - 1), 255.9999 / 4)
-            | i <- [0 .. imageWidth - 1]
-          ]
-          | j <- [imageHeight, imageHeight - 1 .. 0]
-        ] ::
-          [[(Double, Double, Double)]]
-   in map (\(x, y, z) -> (floor x, floor y, floor z)) $ concat vals
+  putStrLn $ printf "P3\n%d %d\n255" imageWidth imageHeight
+  traverse_
+    putStrLn
+    [ outputPixel (r, g, 0.25) | j <- [imageHeight - 1, imageHeight - 2 .. 0], let g = scale imageHeight j, i <- [0 .. imageWidth - 1], let r = scale imageWidth i
+    ]
