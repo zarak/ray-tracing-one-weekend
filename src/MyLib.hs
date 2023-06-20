@@ -43,4 +43,4 @@ generateImage j = do
 someFunc :: IO ()
 someFunc = do
   putStrLn $ printf "P3\n%d %d\n255" imageWidth imageHeight
-  generateImage (imageHeight - 1)
+  generateImage imageHeight
