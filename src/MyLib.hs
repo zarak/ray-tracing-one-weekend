@@ -12,7 +12,7 @@ type Radius = Double
 -- oc: vector from the center of the circle to the base of the ray
 hitSphere :: Point -> Radius -> Ray -> Bool
 hitSphere center radius r =
-  let oc = r.base.toVec3 - center.toVec3
+  let oc = center |-> r.base
       a = dot r.direction r.direction
       b = 2.0 * dot oc r.direction
       c = dot oc oc - radius * radius

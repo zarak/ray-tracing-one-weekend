@@ -4,6 +4,10 @@ module Vec3 where
 
 import Prelude hiding (length)
 
+type StartPoint = Point
+
+type EndPoint = Point
+
 newtype Point = Point
   { toVec3 :: Vec3
   }
@@ -59,6 +63,11 @@ scaleDiv (Vec3 x y z) s = Vec3 (x / s) (y / s) (z / s)
 v ^/ t = scaleDiv v t
 
 infixl 7 ^/
+
+(|->) :: StartPoint -> EndPoint -> Vec3
+p1 |-> p2 = p2.toVec3 - p1.toVec3
+
+infix 6 |->
 
 unitVector :: Vec3 -> Vec3
 unitVector v = v ^/ length v
