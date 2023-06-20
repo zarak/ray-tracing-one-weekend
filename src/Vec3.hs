@@ -49,6 +49,11 @@ infixl 7 ^*
 scaleDiv :: Vec3 -> Double -> Vec3
 scaleDiv (Vec3 x y z) s = Vec3 (x / s) (y / s) (z / s)
 
+(^/) :: Vec3 -> Double -> Vec3
+v ^/ t = scaleDiv v t
+
+infixl 7 ^/
+
 unitVector :: Vec3 -> Vec3
 unitVector v = scaleDiv v (length v)
 
