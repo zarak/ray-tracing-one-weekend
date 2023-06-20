@@ -15,17 +15,17 @@ import Vec3
 rayColor :: Ray -> Maybe [HitRecord] -> Color
 rayColor r mHitRecords =
   let unitDirection = unitVector r.direction
-      -- Compute the parameter t if the ray misses the object
       missT = 0.5 * unitDirection.y + 1.0
       blue = color 0.5 0.7 1.0
+      blueWhiteLerp = Color $ (1.0 - missT) *^ white.toVec3 + missT *^ blue.toVec3
    in case mHitRecords of
-        Nothing -> Color $ (1.0 - missT) *^ white.toVec3 + missT *^ blue.toVec3
+        Nothing -> blueWhiteLerp
         Just hitRecords -> do
           let nearest = minimumBy (compare `on` t) hitRecords
           Color $ unitToInterval nearest.normal
 
 rayHits :: Hittable a => [a] -> Ray -> Maybe [HitRecord]
-rayHits world r = traverse (\a -> hit a r 0 (fromRational infinity)) world
+rayHits world r = traverse (\a -> hit a r (0, fromRational infinity)) world
 
 -- Generate the line of a PPM format image
 generateLine :: Hittable a => [a] -> Int -> IO ()

@@ -19,7 +19,7 @@ data HitRecord = HitRecord
   }
 
 class Hittable a where
-  hit :: a -> Ray -> TMin -> TMax -> Maybe HitRecord
+  hit :: a -> Ray -> (TMin, TMax) -> Maybe HitRecord
 
 setFaceNormal :: Ray -> Vec3 -> (Face, Vec3)
 setFaceNormal r outwardNormal
