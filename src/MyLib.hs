@@ -1,53 +1,64 @@
 module MyLib (someFunc) where
 
 import Color (Color (..), color, writeColor)
+import Data.Foldable (minimumBy)
+import Data.Function (on)
 import GHC.Real (infinity)
 import Hittable
 import Ray
 import RtWeekend
+import Sphere
 import System.IO (hFlush, hPutStr, stderr)
 import Text.Printf
 import Vec3
 
-rayColor :: Hittable a => Ray -> a -> Color
-rayColor r hittable =
+rayColor :: Ray -> Maybe [HitRecord] -> Color
+rayColor r mHitRecords =
   let unitDirection = unitVector r.direction
       -- Compute the parameter t if the ray misses the object
       missT = 0.5 * unitDirection.y + 1.0
       blue = color 0.5 0.7 1.0
-   in case hit hittable r 0 (fromRational infinity) of
+   in case mHitRecords of
         Nothing -> Color $ (1.0 - missT) *^ white.toVec3 + missT *^ blue.toVec3
-        Just hitRecord -> Color $ unitToInterval hitRecord.normal
+        Just hitRecords -> do
+          let nearest = minimumBy (compare `on` t) hitRecords
+          Color $ unitToInterval nearest.normal
+
+rayHits :: Hittable a => [a] -> Ray -> Maybe [HitRecord]
+rayHits world r = traverse (\a -> hit a r 0 (fromRational infinity)) world
 
 -- Generate the line of a PPM format image
-generateLine :: Int -> IO ()
-generateLine j = do
+generateLine :: Hittable a => [a] -> Int -> IO ()
+generateLine world j = do
   putStrLn $
     unlines
-      [ writeColor c | i <- [0 .. imageWidth - 1], let c = drawRay i j
+      [ writeColor c | i <- [0 .. imageWidth - 1], let c = drawRay world i j
       ]
 
-drawRay :: Int -> Int -> Color
-drawRay i j =
+drawRay :: Hittable a => [a] -> Int -> Int -> Color
+drawRay world i j =
   let u = fromIntegral i / fromIntegral (imageWidth - 1)
       v = fromIntegral j / fromIntegral (imageHeight - 1)
       r = Ray origin (lowerLeftCorner + u *^ horizontal + v *^ vertical - origin.toVec3)
-      pixelColor = rayColor r
+      pixelColor = rayColor r (rayHits world r)
    in pixelColor
 
 -- Generate image (without header) and display progress
-generateImage :: Int -> IO ()
-generateImage 0 = do
+generateImage :: Hittable a => [a] -> Int -> IO ()
+generateImage _ 0 = do
   hPutStr stderr "\rScanlines remaining: 0 \nDone.\n"
   hFlush stderr
-generateImage j = do
+generateImage world j = do
   hPutStr stderr ("\rScanlines remaining: " ++ show j ++ "\n")
   hFlush stderr
-  generateLine j
-  generateImage (j - 1)
+  generateLine world j
+  generateImage world (j - 1)
 
 -- Generate image with header
 someFunc :: IO ()
 someFunc = do
+  let sphere1 = Sphere (point 0 0 -1) 0.5
+      sphere2 = Sphere (point 0 -100.5 -1) 100
+      world = [sphere1, sphere2]
   putStrLn $ printf "P3\n%d %d\n255" imageWidth imageHeight
-  generateImage imageHeight
+  generateImage world imageHeight
