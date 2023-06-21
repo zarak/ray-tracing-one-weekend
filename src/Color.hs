@@ -15,6 +15,12 @@ newtype Color = Color
   }
   deriving (Show, Num)
 
+instance Semigroup Color where
+  c1 <> c2 = Color $ c1.toVec3 + c2.toVec3
+
+instance Monoid Color where
+  mempty = black
+
 white :: Color
 white = color 1 1 1
 
@@ -23,12 +29,6 @@ black = color 0 0 0
 
 color :: Red -> Green -> Blue -> Color
 color a b c = Color $ Vec3 a b c
-
--- writeColor :: Color -> String
--- writeColor (Color v) = printf "%d %d %d" (scaleColor v.x) (scaleColor v.y) (scaleColor v.z)
---   where
---     scaleColor :: Double -> Int
---     scaleColor color' = truncate (255.999 * color')
 
 writeColor :: Color -> Int -> String
 writeColor (Color (Vec3 r g b)) samplesPerPixel =

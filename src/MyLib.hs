@@ -40,9 +40,9 @@ rayColor r =
 generateLine :: Int -> Gen (PrimState IO) -> IO ()
 generateLine j g = do
   colors <- forM [1 .. imageWidth] $ \i -> do
-    c <- replicateM samplesPerPixel $ do
+    cs <- replicateM samplesPerPixel $ do
       drawRay i j g
-    let summedColors = foldl' (\c1 c2 -> Color $ c1.toVec3 + c2.toVec3) black c
+    let summedColors = foldl' (<>) mempty cs
     pure $ writeColor summedColors samplesPerPixel
   putStrLn $ unlines colors
 
