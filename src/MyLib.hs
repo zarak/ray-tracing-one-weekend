@@ -7,6 +7,8 @@ import Camera
 import Color (Color (..), color, scaleColor, white, writeColor)
 import Control.Monad (forM, replicateM)
 import Control.Monad.Primitive
+import Data.Text qualified as T
+import Data.Text.IO qualified as T (putStrLn)
 import GHC.Real (infinity)
 import Hittable
 import Ray
@@ -53,7 +55,7 @@ generateLine j g = do
       drawRay i j g
     let summedColors = foldr (<>) mempty cs
     pure $ writeColor summedColors samplesPerPixel
-  putStrLn $ unlines sampledColors
+  T.putStrLn $ T.unlines sampledColors
 
 drawRay :: PrimMonad m => Int -> Int -> Gen (PrimState m) -> m Color
 drawRay i j g = do

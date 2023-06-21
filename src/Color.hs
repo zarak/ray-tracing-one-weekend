@@ -1,7 +1,9 @@
 module Color where
 
+import Data.Text (Text)
+import Data.Text.Format (format)
+import Data.Text.Lazy (toStrict)
 import RtWeekend
-import Text.Printf (printf)
 import Vec3
 
 type Red = Double
@@ -33,7 +35,7 @@ color a b c = Color $ Vec3 a b c
 scaleColor :: Double -> Color -> Color
 scaleColor t c = Color $ t *^ c.toVec3
 
-writeColor :: Color -> Int -> String
+writeColor :: Color -> Int -> Text
 writeColor (Color (Vec3 r g b)) samplesPerPixel =
   -- Divide by the number of ray samples
   let scale = 1.0 / fromIntegral samplesPerPixel
@@ -42,4 +44,4 @@ writeColor (Color (Vec3 r g b)) samplesPerPixel =
       g' = sqrt $ g * scale
       b' = sqrt $ b * scale
       toColor comp = floor (256 * clamp comp 0.0 0.999) :: Int
-   in printf "%d %d %d" (toColor r') (toColor g') (toColor b')
+   in toStrict $ format "{} {} {}" (toColor r', toColor g', toColor b')

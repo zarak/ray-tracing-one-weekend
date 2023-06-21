@@ -29,10 +29,13 @@ library
     -- other-modules:
     default-extensions: OverloadedRecordDot
                       , NegativeLiterals
+                      , OverloadedStrings
     build-depends:    base ^>=4.16.4.0
                     , random
                     , mwc-random
                     , primitive
+                    , text
+                    , text-format
     hs-source-dirs:   src
     default-language: GHC2021
 
