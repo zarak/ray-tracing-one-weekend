@@ -1,13 +1,18 @@
 module MyLib (someFunc) where
 
 import Camera
-import Color (Color (..), color, white, writeColor)
+import Color (Color (..), black, color, white, writeColor)
+import Control.Monad (forM, replicateM)
+import Control.Monad.Primitive
+import Data.Foldable (foldl')
 import GHC.Real (infinity)
 import Hittable
 import Ray
 import RtWeekend
 import Sphere
 import System.IO (hFlush, hPutStr, stderr)
+import System.Random.MWC
+import System.Random.MWC qualified as MWC
 import Text.Printf
 import Vec3
 
@@ -32,34 +37,39 @@ rayColor r =
           Color $ unitToInterval hitRecord.normal
 
 -- Generate the line of a PPM format image
-generateLine :: Int -> IO ()
-generateLine j = do
-  putStrLn $
-    unlines
-      [ writeColor c samplesPerPixel | i <- [0 .. imageWidth - 1], let c = drawRay i j
-      ]
+generateLine :: Int -> Gen (PrimState IO) -> IO ()
+generateLine j g = do
+  colors <- forM [1 .. imageWidth] $ \i -> do
+    c <- replicateM samplesPerPixel $ do
+      drawRay i j g
+    let summedColors = foldl' (\c1 c2 -> Color $ c1.toVec3 + c2.toVec3) black c
+    pure $ writeColor summedColors samplesPerPixel
+  putStrLn $ unlines colors
 
-drawRay :: Int -> Int -> Color
-drawRay i j =
-  let u = fromIntegral i / fromIntegral (imageWidth - 1)
-      v = fromIntegral j / fromIntegral (imageHeight - 1)
+drawRay :: PrimMonad m => Int -> Int -> Gen (PrimState m) -> m Color
+drawRay i j g = do
+  x <- randomDouble g
+  y <- randomDouble g
+  let u = (fromIntegral i + x) / fromIntegral (imageWidth - 1)
+      v = (fromIntegral j + y) / fromIntegral (imageHeight - 1)
       r = getRay u v
       pixelColor = rayColor r
-   in pixelColor
+   in pure pixelColor
 
 -- Generate image (without header) and display progress
-generateImage :: Int -> IO ()
-generateImage 0 = do
+generateImage :: Int -> Gen (PrimState IO) -> IO ()
+generateImage 0 _ = do
   hPutStr stderr "\rScanlines remaining: 0 \nDone.\n"
   hFlush stderr
-generateImage j = do
+generateImage j g = do
   hPutStr stderr ("\rScanlines remaining: " ++ show j ++ "\n")
   hFlush stderr
-  generateLine j
-  generateImage (j - 1)
+  generateLine j g
+  generateImage (j - 1) g
 
 -- Generate image with header
 someFunc :: IO ()
 someFunc = do
+  g <- MWC.create
   putStrLn $ printf "P3\n%d %d\n255" imageWidth imageHeight
-  generateImage imageHeight
+  generateImage imageHeight g

@@ -37,4 +37,4 @@ writeColor (Color (Vec3 r g b)) samplesPerPixel =
       g' = g * scale
       b' = b * scale
       toColor comp = floor (256 * clamp comp 0.0 0.999) :: Int
-   in printf "%d %d %d\n" (toColor r') (toColor g') (toColor b')
+   in printf "%d %d %d" (toColor r') (toColor g') (toColor b')
