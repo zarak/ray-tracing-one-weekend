@@ -30,6 +30,9 @@ black = color 0 0 0
 color :: Red -> Green -> Blue -> Color
 color a b c = Color $ Vec3 a b c
 
+scaleColor :: Double -> Color -> Color
+scaleColor t c = Color $ t *^ c.toVec3
+
 writeColor :: Color -> Int -> String
 writeColor (Color (Vec3 r g b)) samplesPerPixel =
   let scale = 1.0 / fromIntegral samplesPerPixel

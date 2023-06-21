@@ -4,7 +4,7 @@
 module MyLib (someFunc) where
 
 import Camera
-import Color (Color (..), color, white, writeColor)
+import Color (Color (..), color, scaleColor, white, writeColor)
 import Control.Monad (forM, replicateM)
 import Control.Monad.Primitive
 import GHC.Real (infinity)
@@ -27,19 +27,20 @@ world =
       sphere2 = Sphere (point 0 -100.5 -1) 100
    in World [sphere1, sphere2]
 
-rayColor :: Ray -> Maybe Vec3 -> Color
-rayColor r mRandomUnitVec =
+rayColor :: PrimMonad m => Ray -> Gen (PrimState m) -> Int -> m Color
+rayColor r g depth = do
   let unitDirection = unitVector r.direction
-      missT = 0.5 * unitDirection.y + 1.0
+      t = 0.5 * (unitDirection.y + 1.0)
       blue = color 0.5 0.7 1.0
-      blueWhiteLerp = Color $ (1.0 - missT) *^ white.toVec3 + missT *^ blue.toVec3
-   in case hit world r (0, fromRational infinity) of
-        Nothing -> blueWhiteLerp
-        Just rec -> do
-          case mRandomUnitVec of
-            Nothing -> Color $ unitToInterval rec.normal
-
--- Just randomUnitVec ->
+      blueWhiteLerp = Color $ (1.0 - t) *^ white.toVec3 + t *^ blue.toVec3
+  case hit world r (0, fromRational infinity) of
+    Nothing -> pure blueWhiteLerp
+    Just rec -> do
+      randomUnitVec <- randomInUnitSphere g
+      let target = rec.p.toVec3 + rec.normal + randomUnitVec
+          newRay = Ray rec.p (target - rec.p.toVec3)
+      newColor <- rayColor newRay g (depth - 1)
+      pure $ scaleColor 0.5 newColor
 
 -- Generate the line of a PPM format image
 generateLine :: Int -> Gen (PrimState IO) -> IO ()
@@ -55,12 +56,11 @@ drawRay :: PrimMonad m => Int -> Int -> Gen (PrimState m) -> m Color
 drawRay i j g = do
   x <- randomDouble g
   y <- randomDouble g
-  unitVec <- maybeHead <$> randomInUnitSphere g
   let u = (fromIntegral i + x) / fromIntegral (imageWidth - 1)
       v = (fromIntegral j + y) / fromIntegral (imageHeight - 1)
       r = getRay u v
-      pixelColor = rayColor r unitVec
-   in pure pixelColor
+      pixelColor = rayColor r g maximumDepth
+   in pixelColor
 
 -- Generate image (without header) and display progress
 generateImage :: Int -> Gen (PrimState IO) -> IO ()
