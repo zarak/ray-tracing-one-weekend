@@ -10,12 +10,17 @@ import Test.Hspec.QuickCheck (prop)
 import Test.QuickCheck
 import Vec3 (Vec3 (..), cross, dot, scaleDiv, scaleVec3, unitToInterval, unitVector)
 
-instance Arbitrary Vec3 where
+newtype Vec3' = Vec3'
+  { toVec3 :: Vec3
+  }
+  deriving (Show)
+
+instance Arbitrary Vec3' where
   arbitrary = do
     x <- arbitrary
     y <- arbitrary
     z <- arbitrary
-    return (Vec3 x y z)
+    pure $ Vec3' (Vec3 x y z)
 
 spec :: Spec
 spec = do
@@ -36,8 +41,8 @@ spec = do
       scaleDiv (Vec3 2 4 6) 2 `shouldBe` Vec3 1 2 3
 
     prop "" $ do
-      let propAbsSignum :: Vec3 -> Bool
-          propAbsSignum (Vec3 x y z) = all (\v -> abs v * signum v == v) [x, y, z]
+      let propAbsSignum :: Vec3' -> Bool
+          propAbsSignum (Vec3' (Vec3 x y z)) = all (\v -> abs v * signum v == v) [x, y, z]
       propAbsSignum
 
   describe "dot" $ do
