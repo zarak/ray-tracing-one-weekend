@@ -72,6 +72,6 @@ generateImage j g = do
 -- Generate image with header
 someFunc :: IO ()
 someFunc = do
-  g <- MWC.create
+  g <- MWC.createSystemRandom
   putStrLn $ printf "P3\n%d %d\n255" imageWidth imageHeight
   generateImage imageHeight g

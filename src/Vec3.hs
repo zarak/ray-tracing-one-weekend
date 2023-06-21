@@ -20,12 +20,6 @@ data Vec3 = Vec3
   }
   deriving (Show, Eq)
 
-point :: Double -> Double -> Double -> Point
-point a b c = Point $ Vec3 a b c
-
-zeros :: Vec3
-zeros = Vec3 0 0 0
-
 instance Num Vec3 where
   v + w = Vec3 (v.x + w.x) (v.y + w.y) (v.z + w.z)
   v - w = Vec3 (v.x - w.x) (v.y - w.y) (v.z - w.z)
@@ -37,6 +31,12 @@ instance Num Vec3 where
 instance Fractional Vec3 where
   v / w = Vec3 (v.x / w.x) (v.y / w.y) (v.z / w.z)
   fromRational r = let s = fromRational r in Vec3 s s s
+
+point :: Double -> Double -> Double -> Point
+point a b c = Point $ Vec3 a b c
+
+zeros :: Vec3
+zeros = Vec3 0 0 0
 
 length :: Vec3 -> Double
 length = sqrt . lengthSquared
