@@ -31,4 +31,6 @@ clamp x low high = max low (min high x)
 randomDouble :: PrimMonad m => Gen (PrimState m) -> m Double
 randomDouble g = do
   s <- MWC.uniformR (0, 1) g
-  pure $ s - 2 ** (-53) -- subtract this value to get [0, 1) instead of (0,1]
+  -- subtract this value to get [0, 1) instead of (0,1]
+  -- See https://hackage.haskell.org/package/mwc-random-0.15.0.2/docs/src/System.Random.MWC.html#uniform
+  pure $ s - 2 ** (-53)

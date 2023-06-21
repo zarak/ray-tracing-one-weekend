@@ -2,6 +2,8 @@
 
 module Vec3 where
 
+import System.Random.MWC (Uniform, UniformRange (uniformRM))
+import System.Random.Stateful (Uniform (..))
 import Prelude hiding (length)
 
 type StartPoint = Point
@@ -31,6 +33,16 @@ instance Num Vec3 where
 instance Fractional Vec3 where
   v / w = Vec3 (v.x / w.x) (v.y / w.y) (v.z / w.z)
   fromRational r = let s = fromRational r in Vec3 s s s
+
+instance UniformRange Vec3 where
+  uniformRM (lo, hi) rng = do
+    x <- uniformRM (lo.x, hi.x :: Double) rng
+    y <- uniformRM (lo.y, hi.y :: Double) rng
+    z <- uniformRM (lo.z, hi.z :: Double) rng
+    pure $ Vec3 x y z
+
+instance Uniform Vec3 where
+  uniformM = uniformRM (0, 1)
 
 point :: Double -> Double -> Double -> Point
 point a b c = Point $ Vec3 a b c
