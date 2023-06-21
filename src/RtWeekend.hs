@@ -50,6 +50,6 @@ randomDouble g = do
 randomInUnitSphere :: PrimMonad m => Gen (PrimState m) -> m Vec3
 randomInUnitSphere g = do
   v <- uniformRM (-1, 1 :: Vec3) g
-  if lengthSquared v >= 1
+  if lengthSquared v >= 1 || lengthSquared v <= 0.01
     then randomInUnitSphere g
     else pure v

@@ -32,18 +32,20 @@ world =
       sphere2 = Sphere (point 0 -100.5 -1) 100
    in World [sphere1, sphere2]
 
+-- TODO: Create a big batch of random vectors and filter for possible perf gain
 rayColor :: PrimMonad m => Ray -> Gen (PrimState m) -> Int -> m Color
 rayColor r g depth = do
   let unitDirection = unitVector r.direction
       t = 0.5 * (unitDirection.y + 1.0)
       blue = color 0.5 0.7 1.0
-      blueWhiteLerp = Color $ (1.0 - t) *^ white.toVec3 + t *^ blue.toVec3
+      blueWhiteLerp = scaleColor (1.0 - t) white <> scaleColor t blue
   case hit world r (shadowAcne, fromRational infinity) of
     Nothing -> pure blueWhiteLerp
     Just rec -> do
-      randomUnitVec <- unitVector <$> randomInUnitSphere g
+      -- randomUnitVec <- unitVector <$> randomInUnitSphere g
+      randomUnitVec <- randomInUnitSphere g
       let target = rec.p.toVec3 + rec.normal + randomUnitVec
-          newRay = Ray rec.p (target - rec.p.toVec3)
+          newRay = Ray rec.p (rec.p |-> Point target)
       newColor <- rayColor newRay g (depth - 1)
       pure $ scaleColor 0.5 newColor
 
