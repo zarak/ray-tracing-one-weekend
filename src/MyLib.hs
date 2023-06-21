@@ -21,6 +21,9 @@ import Vec3
 samplesPerPixel :: Int
 samplesPerPixel = 100
 
+shadowAcne :: Double
+shadowAcne = 0.001
+
 world :: World Sphere
 world =
   let sphere1 = Sphere (point 0 0 -1) 0.5
@@ -33,7 +36,7 @@ rayColor r g depth = do
       t = 0.5 * (unitDirection.y + 1.0)
       blue = color 0.5 0.7 1.0
       blueWhiteLerp = Color $ (1.0 - t) *^ white.toVec3 + t *^ blue.toVec3
-  case hit world r (0, fromRational infinity) of
+  case hit world r (shadowAcne, fromRational infinity) of
     Nothing -> pure blueWhiteLerp
     Just rec -> do
       randomUnitVec <- randomInUnitSphere g
