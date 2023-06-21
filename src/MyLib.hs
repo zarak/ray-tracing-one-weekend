@@ -41,12 +41,12 @@ rayColor r =
 -- Generate the line of a PPM format image
 generateLine :: Int -> Gen (PrimState IO) -> IO ()
 generateLine j g = do
-  colors <- forM [1 .. imageWidth] $ \i -> do
+  sampledColors <- forM [1 .. imageWidth] $ \i -> do
     cs <- replicateM samplesPerPixel $ do
       drawRay i j g
     let summedColors = foldr (<>) mempty cs
     pure $ writeColor summedColors samplesPerPixel
-  putStrLn $ unlines colors
+  putStrLn $ unlines sampledColors
 
 drawRay :: PrimMonad m => Int -> Int -> Gen (PrimState m) -> m Color
 drawRay i j g = do

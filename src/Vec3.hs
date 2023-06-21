@@ -37,6 +37,10 @@ instance Num Vec3 where
   signum _ = 1
   fromInteger n = let r = fromInteger n in Vec3 r r r
 
+instance Fractional Vec3 where
+  v / w = Vec3 (v.x / w.x) (v.y / w.y) (v.z / w.z)
+  fromRational r = let s = fromRational r in Vec3 s s s
+
 length :: Vec3 -> Double
 length = sqrt . lengthSquared
 
