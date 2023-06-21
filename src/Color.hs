@@ -35,9 +35,11 @@ scaleColor t c = Color $ t *^ c.toVec3
 
 writeColor :: Color -> Int -> String
 writeColor (Color (Vec3 r g b)) samplesPerPixel =
+  -- Divide by the number of ray samples
   let scale = 1.0 / fromIntegral samplesPerPixel
-      r' = r * scale
-      g' = g * scale
-      b' = b * scale
+      -- Square root is to gamma-correct for gamma=2.0
+      r' = sqrt $ r * scale
+      g' = sqrt $ g * scale
+      b' = sqrt $ b * scale
       toColor comp = floor (256 * clamp comp 0.0 0.999) :: Int
    in printf "%d %d %d" (toColor r') (toColor g') (toColor b')
