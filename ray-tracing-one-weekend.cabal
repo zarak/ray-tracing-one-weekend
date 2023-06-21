@@ -60,4 +60,5 @@ test-suite ray-tracing-one-weekend-test
     build-depends:
         base ^>=4.16.4.0,
         ray-tracing-one-weekend,
-        hspec
+        hspec,
+        QuickCheck

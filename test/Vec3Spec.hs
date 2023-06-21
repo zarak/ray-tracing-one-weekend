@@ -1,7 +1,21 @@
+{-# LANGUAGE FlexibleInstances #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+
+{-# HLINT ignore "Use <$>" #-}
+
 module Vec3Spec (spec) where
 
 import Test.Hspec
+import Test.Hspec.QuickCheck (prop)
+import Test.QuickCheck
 import Vec3 (Vec3 (..), cross, dot, scaleDiv, scaleVec3, unitToInterval, unitVector)
+
+instance Arbitrary Vec3 where
+  arbitrary = do
+    x <- arbitrary
+    y <- arbitrary
+    z <- arbitrary
+    return (Vec3 x y z)
 
 spec :: Spec
 spec = do
@@ -20,6 +34,11 @@ spec = do
 
     it "should divide vectors by scalar correctly" $ do
       scaleDiv (Vec3 2 4 6) 2 `shouldBe` Vec3 1 2 3
+
+    prop "" $ do
+      let propAbsSignum :: Vec3 -> Bool
+          propAbsSignum (Vec3 x y z) = all (\v -> abs v * signum v == v) [x, y, z]
+      propAbsSignum
 
   describe "dot" $ do
     it "should compute dot product correctly" $ do

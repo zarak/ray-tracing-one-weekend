@@ -30,11 +30,8 @@ instance Num Vec3 where
   v + w = Vec3 (v.x + w.x) (v.y + w.y) (v.z + w.z)
   v - w = Vec3 (v.x - w.x) (v.y - w.y) (v.z - w.z)
   v * w = Vec3 (v.x * w.x) (v.y * w.y) (v.z * w.z)
-
-  -- Note that `abs` and `signum` must satisfy `abs x * signum x == x`, so they
-  -- cannot be defined component-wise.
-  abs = id
-  signum _ = 1
+  abs (Vec3 x y z) = Vec3 (abs x) (abs y) (abs z)
+  signum (Vec3 x y z) = Vec3 (signum x) (signum y) (signum z)
   fromInteger n = let r = fromInteger n in Vec3 r r r
 
 instance Fractional Vec3 where
