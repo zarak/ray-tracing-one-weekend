@@ -39,7 +39,7 @@ rayColor r g depth = do
   case hit world r (shadowAcne, fromRational infinity) of
     Nothing -> pure blueWhiteLerp
     Just rec -> do
-      randomUnitVec <- randomInUnitSphere g
+      randomUnitVec <- randomUnitVector g
       let target = rec.p.toVec3 + rec.normal + randomUnitVec
           newRay = Ray rec.p (target - rec.p.toVec3)
       newColor <- rayColor newRay g (depth - 1)

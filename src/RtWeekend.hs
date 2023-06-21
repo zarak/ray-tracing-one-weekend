@@ -53,3 +53,8 @@ randomInUnitSphere g = do
   if lengthSquared v >= 1
     then randomInUnitSphere g
     else pure v
+
+randomUnitVector :: PrimMonad m => Gen (PrimState m) -> m Vec3
+randomUnitVector g = do
+  v <- randomInUnitSphere g
+  pure $ unitVector v
