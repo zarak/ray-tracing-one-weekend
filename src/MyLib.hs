@@ -1,10 +1,12 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+
+{-# HLINT ignore "Use fold" #-}
 module MyLib (someFunc) where
 
 import Camera
-import Color (Color (..), black, color, white, writeColor)
+import Color (Color (..), color, white, writeColor)
 import Control.Monad (forM, replicateM)
 import Control.Monad.Primitive
-import Data.Foldable (foldl')
 import GHC.Real (infinity)
 import Hittable
 import Ray
@@ -42,7 +44,7 @@ generateLine j g = do
   colors <- forM [1 .. imageWidth] $ \i -> do
     cs <- replicateM samplesPerPixel $ do
       drawRay i j g
-    let summedColors = foldl' (<>) mempty cs
+    let summedColors = foldr (<>) mempty cs
     pure $ writeColor summedColors samplesPerPixel
   putStrLn $ unlines colors
 
