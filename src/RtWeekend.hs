@@ -4,6 +4,14 @@ import Camera
 import Control.Monad.Primitive
 import System.Random.MWC
 import System.Random.MWC qualified as MWC
+import Vec3
+
+------------------------------------------------------------------------------
+-- Constants
+------------------------------------------------------------------------------
+
+maximumDepth :: Int
+maximumDepth = 50
 
 ------------------------------------------------------------------------------
 -- Image
@@ -23,6 +31,10 @@ degreesToRadians deg = deg * pi / 180
 clamp :: Double -> Double -> Double -> Double
 clamp x low high = max low (min high x)
 
+maybeHead :: [a] -> Maybe a
+maybeHead [] = Nothing
+maybeHead (x : _) = Just x
+
 ------------------------------------------------------------------------------
 -- Random
 ------------------------------------------------------------------------------
@@ -34,3 +46,10 @@ randomDouble g = do
   -- subtract this value to get [0, 1) instead of (0,1]
   -- See https://hackage.haskell.org/package/mwc-random-0.15.0.2/docs/src/System.Random.MWC.html#uniform
   pure $ s - 2 ** (-53)
+
+randomInUnitSphere :: PrimMonad m => Gen (PrimState m) -> m Vec3
+randomInUnitSphere g = do
+  v <- uniformRM (-1, 1 :: Vec3) g
+  if lengthSquared v >= 1
+    then randomInUnitSphere g
+    else pure v

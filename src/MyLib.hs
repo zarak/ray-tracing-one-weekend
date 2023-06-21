@@ -27,16 +27,19 @@ world =
       sphere2 = Sphere (point 0 -100.5 -1) 100
    in World [sphere1, sphere2]
 
-rayColor :: Ray -> Color
-rayColor r =
+rayColor :: Ray -> Maybe Vec3 -> Color
+rayColor r mRandomUnitVec =
   let unitDirection = unitVector r.direction
       missT = 0.5 * unitDirection.y + 1.0
       blue = color 0.5 0.7 1.0
       blueWhiteLerp = Color $ (1.0 - missT) *^ white.toVec3 + missT *^ blue.toVec3
    in case hit world r (0, fromRational infinity) of
         Nothing -> blueWhiteLerp
-        Just hitRecord -> do
-          Color $ unitToInterval hitRecord.normal
+        Just rec -> do
+          case mRandomUnitVec of
+            Nothing -> Color $ unitToInterval rec.normal
+
+-- Just randomUnitVec ->
 
 -- Generate the line of a PPM format image
 generateLine :: Int -> Gen (PrimState IO) -> IO ()
@@ -52,10 +55,11 @@ drawRay :: PrimMonad m => Int -> Int -> Gen (PrimState m) -> m Color
 drawRay i j g = do
   x <- randomDouble g
   y <- randomDouble g
+  unitVec <- maybeHead <$> randomInUnitSphere g
   let u = (fromIntegral i + x) / fromIntegral (imageWidth - 1)
       v = (fromIntegral j + y) / fromIntegral (imageHeight - 1)
       r = getRay u v
-      pixelColor = rayColor r
+      pixelColor = rayColor r unitVec
    in pure pixelColor
 
 -- Generate image (without header) and display progress
