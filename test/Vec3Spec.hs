@@ -40,9 +40,11 @@ spec = do
     it "should divide vectors by scalar correctly" $ do
       scaleDiv (Vec3 2 4 6) 2 `shouldBe` Vec3 1 2 3
 
+    it "should divide vectors by scalar with /" $ do
+      Vec3 2 4 6 / 2 `shouldBe` Vec3 1 2 3
     prop "" $ do
       let propAbsSignum :: Vec3' -> Bool
-          propAbsSignum (Vec3' (Vec3 x y z)) = all (\v -> abs v * signum v == v) [x, y, z]
+          propAbsSignum (Vec3' v) = (\v' -> abs v' * signum v' == v') v
       propAbsSignum
 
   describe "dot" $ do
