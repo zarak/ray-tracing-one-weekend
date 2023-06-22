@@ -100,3 +100,6 @@ nearZero v =
   (abs v.x < tolerance) && (abs v.y < tolerance) && (abs v.z < tolerance)
   where
     tolerance = 1e-8
+
+reflect :: Vec3 -> Vec3 -> Vec3
+reflect v normal = v - (2.0 * dot v normal) *^ normal
