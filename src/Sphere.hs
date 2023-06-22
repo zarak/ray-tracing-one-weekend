@@ -50,6 +50,6 @@ instance Hittable a => Hittable (World a) where
       mHitRecord@(Just hitRecord) ->
         let (tmin, _) = range
          in maybe
-              mHitRecord
+              mHitRecord -- no closer objects found, so return this object
               pure
               (hit (World hs) ray (tmin, hitRecord.t))
