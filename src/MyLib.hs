@@ -1,7 +1,7 @@
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 
 {-# HLINT ignore "Use fold" #-}
-module MyLib (someFunc) where
+module MyLib (someFunc, rayColor, generateLine) where
 
 import Camera
 import Color (Color (..), color, scaleColor, white, writeColor)
@@ -32,7 +32,6 @@ world =
       sphere2 = Sphere (point 0 -100.5 -1) 100
    in World [sphere1, sphere2]
 
--- TODO: Create a big batch of random vectors and filter for possible perf gain
 rayColor :: PrimMonad m => Ray -> Gen (PrimState m) -> Int -> m Color
 rayColor r g depth = do
   let unitDirection = unitVector r.direction
@@ -45,11 +44,11 @@ rayColor r g depth = do
       -- randomUnitVec <- unitVector <$> randomInUnitSphere g
       randomUnitVec <- randomInUnitSphere g
       let target = rec.p.toVec3 + rec.normal + randomUnitVec
-          newRay = Ray rec.p (rec.p |-> Point target)
-      newColor <- rayColor newRay g (depth - 1)
+          bounce = Ray rec.p (rec.p |-> Point target)
+      newColor <- rayColor bounce g (depth - 1)
+      -- Color loses intensity with each ray bounce
       pure $ scaleColor 0.5 newColor
 
--- Generate the line of a PPM format image
 generateLine :: Int -> Gen (PrimState IO) -> IO ()
 generateLine j g = do
   sampledColors <- forM [1 .. imageWidth] $ \i -> do

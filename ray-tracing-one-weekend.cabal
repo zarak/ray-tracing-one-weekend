@@ -69,11 +69,13 @@ test-suite ray-tracing-one-weekend-test
 benchmark ray-tracing-one-weekend-bench 
     type:             exitcode-stdio-1.0
     main-is: Bench.hs 
-    -- other-modules: 
+    other-modules: NFUtils
     hs-source-dirs: benchmarks
     build-depends:
         base ^>=4.16.4.0
       , criterion
       , deepseq
       , ray-tracing-one-weekend
+      , mwc-random
+      , random
     default-language: GHC2021
