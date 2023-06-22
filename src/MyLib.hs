@@ -5,11 +5,10 @@ module MyLib (someFunc, rayColor, generateLine) where
 
 import Camera
 import Color (Color (..), color, scaleColor, white, writeColor)
-import Control.Monad (forM, replicateM, void)
+import Control.Monad (forM, replicateM)
 import Control.Monad.Primitive
 import Data.Text qualified as T
 import Data.Text.IO qualified as T (putStrLn)
-import Debug.Trace
 import GHC.Real (infinity)
 import Hittable
 import Ray
@@ -34,6 +33,7 @@ world =
    in World [sphere1, sphere2]
 
 rayColor :: PrimMonad m => Ray -> Gen (PrimState m) -> Int -> m Color
+rayColor _ _ 0 = pure mempty
 rayColor r g depth = do
   let unitDirection = unitVector r.direction
       t = 0.5 * (unitDirection.y + 1.0)
@@ -43,10 +43,9 @@ rayColor r g depth = do
     Nothing -> pure blueWhiteLerp
     Just rec -> do
       randomUnitVec <- unitVector <$> randomInUnitSphere g
-      -- void $ traceShow ("randomUnitVec " <> show randomUnitVec :: String) $ pure randomUnitVec
-      -- randomUnitVec <- randomInUnitSphere g
-      let target = rec.p.toVec3 + rec.normal + randomUnitVec
-          bounce = Ray rec.p (rec.p |-> Point target)
+      -- Pick a random target point in the unit sphere tangent to the object
+      let target = Point $ rec.p.toVec3 + rec.normal + randomUnitVec
+          bounce = Ray rec.p (rec.p |-> target)
       newColor <- rayColor bounce g (depth - 1)
       -- Color loses intensity with each ray bounce
       pure $ scaleColor 0.5 newColor
