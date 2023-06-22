@@ -26,6 +26,8 @@ library
                     , Sphere
                     , RtWeekend
                     , Camera
+                    , Material 
+                    , MaterialHit
     -- other-modules:
     default-extensions: OverloadedRecordDot
                       , NegativeLiterals

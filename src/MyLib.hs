@@ -11,6 +11,8 @@ import Data.Text qualified as T
 import Data.Text.IO qualified as T (putStrLn)
 import GHC.Real (infinity)
 import Hittable
+import Material
+import MaterialHit
 import Ray
 import RtWeekend
 import Sphere
@@ -26,30 +28,28 @@ samplesPerPixel = 100
 shadowAcne :: Double
 shadowAcne = 0.001
 
-world :: World Sphere
-world =
-  let sphere1 = Sphere (point 0 0 -1) 0.5
-      sphere2 = Sphere (point 0 -100.5 -1) 100
-   in World [sphere1, sphere2]
+world :: PrimMonad m => Gen (PrimState m) -> m (World Sphere)
+world g = do
+  materialGround <- lambertian (color 0.8 0.8 0) g
+  let sphere1 = Sphere (point 0.0 -100.5 -1.0) 100.0 materialGround
+  pure $ World [sphere1]
 
 rayColor :: PrimMonad m => Ray -> Gen (PrimState m) -> Int -> m Color
 rayColor _ _ 0 = pure mempty
 rayColor r g depth = do
+  world' <- world g
   let unitDirection = unitVector r.direction
       t = 0.5 * (unitDirection.y + 1.0)
       blue = color 0.5 0.7 1.0
       blueWhiteLerp = scaleColor (1.0 - t) white <> scaleColor t blue
-  case hit world r (shadowAcne, fromRational infinity) of
+  case hit world' r (shadowAcne, fromRational infinity) of
     Nothing -> pure blueWhiteLerp
     Just rec -> do
-      -- randomUnitVec <- unitVector <$> randomInUnitSphere g
-      randomUnitVec <- randomInHemisphere rec.normal g
-      -- Pick a random target point in the unit sphere tangent to the object
-      let target = Point $ rec.p.toVec3 + rec.normal + randomUnitVec
-          bounce = Ray rec.p (rec.p |-> target)
-      newColor <- rayColor bounce g (depth - 1)
-      -- Color loses intensity with each ray bounce
-      pure $ scaleColor 0.5 newColor
+      case rec.material.scatter r rec of
+        Nothing -> pure white
+        Just s -> do
+          c <- rayColor s.scattered g (depth - 1)
+          pure $ Color $ s.attenuation.toVec3 * c.toVec3
 
 generateLine :: Int -> Gen (PrimState IO) -> IO ()
 generateLine j g = do
