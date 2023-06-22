@@ -28,13 +28,13 @@ instance Hittable Sphere where
 
 findNearestRoot :: Double -> Double -> Double -> (TMin, TMax) -> Maybe Root
 findNearestRoot halfB sqrtd a (tmin, tmax)
-  | rootInRange root1 = pure root1
-  | rootInRange root2 = pure root2
+  | isInRange root1 = pure root1
+  | isInRange root2 = pure root2
   | otherwise = Nothing
   where
     root1 = (-halfB - sqrtd) / a
     root2 = (-halfB + sqrtd) / a
-    rootInRange root = tmin < root && root < tmax
+    isInRange root = tmin < root && root < tmax
 
 newtype World a = World [a]
 
