@@ -66,3 +66,12 @@ spec = do
 
     it "maps (1, 1, 1) to (1, 1, 1)" $
       unitToInterval (Vec3 1 1 1) `shouldBe` Vec3 1 1 1
+
+  describe "nearZero" $ do
+    it "returns True for a Vec3 near zero" $ do
+      let v = Vec3 1e-9 1e-9 1e-9
+      nearZero v `shouldBe` True
+
+    it "returns False for a Vec3 not near zero" $ do
+      let v = Vec3 1 1e-9 1
+      nearZero v `shouldBe` False

@@ -94,3 +94,9 @@ cross (Vec3 x1 y1 z1) (Vec3 x2 y2 z2) = Vec3 (y1 * z2 - z1 * y2) (z1 * x2 - x1 *
 -- Map a vector of unit length to one with components in the range 0 to 1.
 unitToInterval :: Vec3 -> Vec3
 unitToInterval v = (1 + v) ^/ 2
+
+nearZero :: Vec3 -> Bool
+nearZero v =
+  (abs v.x < tolerance) && (abs v.y < tolerance) && (abs v.z < tolerance)
+  where
+    tolerance = 1e-8

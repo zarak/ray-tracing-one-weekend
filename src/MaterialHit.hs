@@ -14,6 +14,12 @@ data HitRecord = HitRecord
     material :: Material
   }
 
-newtype Material = Material
-  { scatter :: Ray -> HitRecord -> Color -> Ray -> Bool
+data Scattered = Scattered
+  { scattered :: Ray,
+    attenuation :: Color
+  }
+
+data Material = Material
+  { scatter :: Ray -> HitRecord -> Maybe Scattered,
+    albedo :: Color
   }

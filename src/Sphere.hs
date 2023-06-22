@@ -1,12 +1,16 @@
+{-# LANGUAGE DuplicateRecordFields #-}
+
 module Sphere where
 
 import Hittable
+import MaterialHit
 import Ray
 import Vec3
 
 data Sphere = Sphere
   { center :: Point,
-    radius :: Double
+    radius :: Double,
+    material :: Material
   }
 
 instance Hittable Sphere where
@@ -27,7 +31,7 @@ instance Hittable Sphere where
         (face, newNormal) = setFaceNormal ray outwardNormal
     if discriminant < 0
       then Nothing
-      else pure $ HitRecord {p = p, t = t, normal = newNormal, face = face}
+      else pure $ HitRecord {p = p, t = t, normal = newNormal, face = face, material = sphere.material}
 
 -- The sphere equation is (A + tb - C) . (A + tb - C) = r^2
 -- Expanding, we have t^2 b.b + 2tb.(A - C) + (A - C).(A - C) = r^2
