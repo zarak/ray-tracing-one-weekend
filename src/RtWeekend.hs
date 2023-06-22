@@ -54,3 +54,8 @@ randomInUnitSphere g = do
   if lengthSquared v >= 1
     then randomInUnitSphere g
     else pure v
+
+randomInHemisphere :: PrimMonad m => Vec3 -> Gen (PrimState m) -> m Vec3
+randomInHemisphere normal g = do
+  inUnitSphere <- randomInUnitSphere g
+  if dot inUnitSphere normal > 0.0 then pure inUnitSphere else pure (-inUnitSphere)

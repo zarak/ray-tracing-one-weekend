@@ -42,7 +42,8 @@ rayColor r g depth = do
   case hit world r (shadowAcne, fromRational infinity) of
     Nothing -> pure blueWhiteLerp
     Just rec -> do
-      randomUnitVec <- unitVector <$> randomInUnitSphere g
+      -- randomUnitVec <- unitVector <$> randomInUnitSphere g
+      randomUnitVec <- randomInHemisphere rec.normal g
       -- Pick a random target point in the unit sphere tangent to the object
       let target = Point $ rec.p.toVec3 + rec.normal + randomUnitVec
           bounce = Ray rec.p (rec.p |-> target)
