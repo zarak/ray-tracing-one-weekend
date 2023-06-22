@@ -5,6 +5,7 @@ import Control.Monad.Primitive
 import System.Random.MWC
 import System.Random.MWC qualified as MWC
 import Vec3
+import Prelude hiding (length)
 
 ------------------------------------------------------------------------------
 -- Constants
@@ -50,6 +51,6 @@ randomDouble g = do
 randomInUnitSphere :: PrimMonad m => Gen (PrimState m) -> m Vec3
 randomInUnitSphere g = do
   v <- uniformRM (-1, 1 :: Vec3) g
-  if lengthSquared v >= 1 || lengthSquared v <= 0.01
+  if lengthSquared v >= 1
     then randomInUnitSphere g
     else pure v
