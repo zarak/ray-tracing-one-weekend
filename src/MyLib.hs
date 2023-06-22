@@ -5,10 +5,11 @@ module MyLib (someFunc, rayColor, generateLine) where
 
 import Camera
 import Color (Color (..), color, scaleColor, white, writeColor)
-import Control.Monad (forM, replicateM)
+import Control.Monad (forM, replicateM, void)
 import Control.Monad.Primitive
 import Data.Text qualified as T
 import Data.Text.IO qualified as T (putStrLn)
+import Debug.Trace
 import GHC.Real (infinity)
 import Hittable
 import Ray
@@ -42,6 +43,7 @@ rayColor r g depth = do
     Nothing -> pure blueWhiteLerp
     Just rec -> do
       randomUnitVec <- unitVector <$> randomInUnitSphere g
+      -- void $ traceShow ("randomUnitVec " <> show randomUnitVec :: String) $ pure randomUnitVec
       -- randomUnitVec <- randomInUnitSphere g
       let target = rec.p.toVec3 + rec.normal + randomUnitVec
           bounce = Ray rec.p (rec.p |-> Point target)

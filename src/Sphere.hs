@@ -22,7 +22,9 @@ instance Hittable Sphere where
         p = Point $ ray `at` t
         outwardNormal = (sphere.center |-> p) ^/ sphere.radius
         (face, newNormal) = setFaceNormal ray outwardNormal
-    pure $ HitRecord {p = p, t = t, normal = newNormal, face = face}
+    if discriminant < 0
+      then Nothing
+      else pure $ HitRecord {p = p, t = t, normal = newNormal, face = face}
 
 findNearestRoot :: Double -> Double -> Double -> (TMin, TMax) -> Maybe Root
 findNearestRoot halfB sqrtd a (tmin, tmax)
