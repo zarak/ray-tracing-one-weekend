@@ -65,3 +65,15 @@ test-suite ray-tracing-one-weekend-test
         ray-tracing-one-weekend,
         hspec,
         QuickCheck
+
+benchmark ray-tracing-one-weekend-bench 
+    type:             exitcode-stdio-1.0
+    main-is: Bench.hs 
+    -- other-modules: 
+    hs-source-dirs: benchmarks
+    build-depends:
+        base ^>=4.16.4.0
+      , criterion
+      , deepseq
+      , ray-tracing-one-weekend
+    default-language: GHC2021
