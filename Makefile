@@ -12,3 +12,6 @@ build:
 
 prof:
 	cabal run ray-tracing-one-weekend --enable-profiling -- +RTS -P
+
+heap:
+	cabal run ray-tracing-one-weekend --enable-profiling -- +RTS -hc
