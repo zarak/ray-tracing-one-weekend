@@ -9,3 +9,6 @@ run:
 
 build:
 	cabal build
+
+prof:
+	cabal run ray-tracing-one-weekend --enable-profiling -- +RTS -P
