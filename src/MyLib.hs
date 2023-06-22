@@ -40,9 +40,9 @@ rayColor r g depth world = do
     Just rec -> do
       case rec.material.scatter r rec of
         Nothing -> pure mempty
-        Just s -> do
-          c <- rayColor s.scattered g (depth - 1) world
-          pure $ Color $ s.attenuation.toVec3 * c.toVec3
+        Just scattered -> do
+          c <- rayColor scattered.ray g (depth - 1) world
+          pure $ Color $ scattered.attenuation.toVec3 * c.toVec3
 
 generateLine :: Int -> Gen (PrimState IO) -> World Sphere -> IO ()
 generateLine j g world = do
@@ -89,5 +89,5 @@ someFunc = do
       sphere2 = Sphere (point 0.0 0.0 -1.0) 0.5 materialCenter
       sphere3 = Sphere (point -1.0 0.0 -1.0) 0.5 materialLeft
       sphere4 = Sphere (point 1.0 0.0 -1.0) 0.5 materialRight
-      world = World [sphere1, sphere2]
+      world = World [sphere1, sphere2, sphere3, sphere4]
   generateImage imageHeight g world

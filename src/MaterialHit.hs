@@ -15,7 +15,7 @@ data HitRecord = HitRecord
   }
 
 data Scattered = Scattered
-  { scattered :: Ray,
+  { ray :: Ray,
     attenuation :: Color
   }
 
