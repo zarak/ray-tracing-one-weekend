@@ -11,6 +11,9 @@ data Sphere = Sphere
 
 instance Hittable Sphere where
   hit sphere ray (tmin, tmax) = do
+    -- P(t), our ray, in parametric form is A + tb from the notation in the book.
+    -- A is the source of the ray, and b is the direction vector.
+    -- In our code, A is ray.base, and b is ray.direction
     let oc = sphere.center |-> ray.base
         a = dot ray.direction ray.direction
         halfB = dot oc ray.direction
@@ -26,6 +29,8 @@ instance Hittable Sphere where
       then Nothing
       else pure $ HitRecord {p = p, t = t, normal = newNormal, face = face}
 
+-- The sphere equation is (A + tb - C) . (A + tb - C) = r^2
+-- Expanding, we have t^2 b.b + 2tb.(A - C) + (A - C).(A - C) = r^2
 findNearestRoot :: Double -> Double -> Double -> (TMin, TMax) -> Maybe Root
 findNearestRoot halfB sqrtd a (tmin, tmax)
   | isInRange root1 = pure root1

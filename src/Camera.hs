@@ -59,10 +59,15 @@ getRay :: Double -> Double -> Ray
 getRay u v =
   Ray
     defaultCamera.origin
-    ( defaultCamera.lowerLeftCorner
-        + u
-        *^ defaultCamera.horizontal
-        + v
-        *^ defaultCamera.vertical
-        - defaultCamera.origin.toVec3
+    -- The direction vector of the ray goes from the origin of the camera to
+    -- a point on the screen with coordinates (u, v)
+    -- See https://raytracing.github.io/images/fig-1.03-cam-geom.jpg
+    ( defaultCamera.origin
+        |-> Point
+          ( defaultCamera.lowerLeftCorner
+              + u
+              *^ defaultCamera.horizontal
+              + v
+              *^ defaultCamera.vertical
+          )
     )
