@@ -96,8 +96,8 @@ unitToInterval :: Vec3 -> Vec3
 unitToInterval v = (1 + v) ^/ 2
 
 nearZero :: Vec3 -> Bool
-nearZero v =
-  (abs v.x < tolerance) && (abs v.y < tolerance) && (abs v.z < tolerance)
+nearZero (Vec3 x y z) =
+  (abs x < tolerance) && (abs y < tolerance) && (abs z < tolerance)
   where
     tolerance = 1e-8
 

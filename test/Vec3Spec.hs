@@ -8,7 +8,7 @@ module Vec3Spec (spec) where
 import Test.Hspec
 import Test.Hspec.QuickCheck (prop)
 import Test.QuickCheck
-import Vec3 (Vec3 (..), cross, dot, scaleDiv, scaleVec3, unitToInterval, unitVector)
+import Vec3 (Vec3 (..), cross, dot, nearZero, scaleDiv, scaleVec3, unitToInterval, unitVector)
 
 newtype Vec3' = Vec3'
   { toVec3 :: Vec3

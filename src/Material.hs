@@ -13,11 +13,10 @@ lambertian albedo g = do
   randomVec <- unitVector <$> randomInUnitSphere g
   let f :: Ray -> HitRecord -> Maybe Scattered
       f _ hitRecord = do
-        let scatterDirection' = hitRecord.normal + randomVec
-            scatterDirection =
-              if nearZero scatterDirection'
+        let scatterDirection =
+              if nearZero $ hitRecord.normal + randomVec
                 then hitRecord.normal
-                else scatterDirection
+                else hitRecord.normal + randomVec
             scattered = Ray hitRecord.p scatterDirection
         pure $ Scattered scattered albedo
   pure $ Material f albedo

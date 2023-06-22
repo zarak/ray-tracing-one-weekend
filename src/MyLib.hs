@@ -28,58 +28,51 @@ samplesPerPixel = 100
 shadowAcne :: Double
 shadowAcne = 0.001
 
-world :: PrimMonad m => Gen (PrimState m) -> m (World Sphere)
-world g = do
-  materialGround <- lambertian (color 0.8 0.8 0) g
-  let sphere1 = Sphere (point 0.0 -100.5 -1.0) 100.0 materialGround
-  pure $ World [sphere1]
-
-rayColor :: PrimMonad m => Ray -> Gen (PrimState m) -> Int -> m Color
-rayColor _ _ 0 = pure mempty
-rayColor r g depth = do
-  world' <- world g
+rayColor :: PrimMonad m => Ray -> Gen (PrimState m) -> Int -> World Sphere -> m Color
+rayColor _ _ 0 _ = pure mempty
+rayColor r g depth world = do
   let unitDirection = unitVector r.direction
       t = 0.5 * (unitDirection.y + 1.0)
       blue = color 0.5 0.7 1.0
       blueWhiteLerp = scaleColor (1.0 - t) white <> scaleColor t blue
-  case hit world' r (shadowAcne, fromRational infinity) of
+  case hit world r (shadowAcne, fromRational infinity) of
     Nothing -> pure blueWhiteLerp
     Just rec -> do
       case rec.material.scatter r rec of
-        Nothing -> pure white
+        Nothing -> pure mempty
         Just s -> do
-          c <- rayColor s.scattered g (depth - 1)
+          c <- rayColor s.scattered g (depth - 1) world
           pure $ Color $ s.attenuation.toVec3 * c.toVec3
 
-generateLine :: Int -> Gen (PrimState IO) -> IO ()
-generateLine j g = do
+generateLine :: Int -> Gen (PrimState IO) -> World Sphere -> IO ()
+generateLine j g world = do
   sampledColors <- forM [1 .. imageWidth] $ \i -> do
     cs <- replicateM samplesPerPixel $ do
-      drawRay i j g
+      drawRay i j g world
     let summedColors = foldr (<>) mempty cs
     pure $ writeColor summedColors samplesPerPixel
   T.putStrLn $ T.unlines sampledColors
 
-drawRay :: PrimMonad m => Int -> Int -> Gen (PrimState m) -> m Color
-drawRay i j g = do
+drawRay :: PrimMonad m => Int -> Int -> Gen (PrimState m) -> World Sphere -> m Color
+drawRay i j g world = do
   x <- randomDouble g
   y <- randomDouble g
   let u = (fromIntegral i + x) / fromIntegral (imageWidth - 1)
       v = (fromIntegral j + y) / fromIntegral (imageHeight - 1)
       r = getRay u v
-      pixelColor = rayColor r g maximumDepth
+      pixelColor = rayColor r g maximumDepth world
    in pixelColor
 
 -- Generate image (without header) and display progress
-generateImage :: Int -> Gen (PrimState IO) -> IO ()
-generateImage 0 _ = do
+generateImage :: Int -> Gen (PrimState IO) -> World Sphere -> IO ()
+generateImage 0 _ _ = do
   hPutStr stderr "\rScanlines remaining: 0 \nDone.\n"
   hFlush stderr
-generateImage j g = do
+generateImage j g world = do
   hPutStr stderr ("\rScanlines remaining: " ++ show j ++ "\n")
   hFlush stderr
-  generateLine j g
-  generateImage (j - 1) g
+  generateLine j g world
+  generateImage (j - 1) g world
 
 -- Generate image with header
 someFunc :: IO ()
@@ -87,4 +80,14 @@ someFunc = do
   -- g <- MWC.createSystemRandom
   g <- MWC.create -- use for testing
   putStrLn $ printf "P3\n%d %d\n255" imageWidth imageHeight
-  generateImage imageHeight g
+  -- Bug: lambertian is not generated randomly if you extract it here
+  materialGround <- lambertian (color 0.8 0.8 0) g
+  materialCenter <- lambertian (color 0.7 0.3 0.3) g
+  let materialLeft = metal (color 0.8 0.8 0.8)
+  let materialRight = metal (color 0.8 0.6 0.2)
+      sphere1 = Sphere (point 0.0 -100.5 -1.0) 100.0 materialGround
+      sphere2 = Sphere (point 0.0 0.0 -1.0) 0.5 materialCenter
+      sphere3 = Sphere (point -1.0 0.0 -1.0) 0.5 materialLeft
+      sphere4 = Sphere (point 1.0 0.0 -1.0) 0.5 materialRight
+      world = World [sphere1, sphere2]
+  generateImage imageHeight g world
