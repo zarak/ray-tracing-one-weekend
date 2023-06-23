@@ -1,5 +1,6 @@
 module Hittable where
 
+import Control.Monad.Primitive
 import MaterialHit
 import Ray
 import Vec3
@@ -11,7 +12,7 @@ type TMax = Double
 type Root = Double
 
 class Hittable a where
-  hit :: a -> Ray -> (TMin, TMax) -> Maybe (HitRecord)
+  hit :: a -> Ray -> (TMin, TMax) -> Maybe HitRecord
 
 -- We use the convention that normals always point against the incident ray.
 -- If the dot product is negative, the ray is outside the sphere so we return a

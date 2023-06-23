@@ -30,18 +30,20 @@ shadowAcne = 0.001
 
 rayColor :: Ray -> Gen (PrimState IO) -> Int -> IO (World Sphere) -> IO Color
 rayColor _ _ 0 _ = pure mempty
-rayColor r g depth world = do
+rayColor r g depth worldIO = do
   let unitDirection = unitVector r.direction
       t = 0.5 * (unitDirection.y + 1.0)
       blue = color 0.5 0.7 1.0
       blueWhiteLerp = scaleColor (1.0 - t) white <> scaleColor t blue
+  world <- worldIO
+
   case hit world r (shadowAcne, fromRational infinity) of
     Nothing -> pure blueWhiteLerp
     Just rec -> do
       case rec.material.scatter r rec of
         Nothing -> pure mempty
         Just scattered -> do
-          c <- rayColor scattered.ray g (depth - 1) world
+          c <- rayColor scattered.ray g (depth - 1) (pure world)
           pure $ Color $ scattered.attenuation.toVec3 * c.toVec3
 
 generateLine :: Int -> Gen (PrimState IO) -> IO (World Sphere) -> IO ()
@@ -80,16 +82,15 @@ someFunc = do
   -- g <- MWC.createSystemRandom
   g <- MWC.create -- use for testing
   putStrLn $ printf "P3\n%d %d\n255" imageWidth imageHeight
-  -- Bug: lambertian is not generated randomly if you extract it here
   let materialGround = lambertian (color 0.8 0.8 0) g
-      -- materialCenter = lambertian (color 0.7 0.3 0.3) g
-      -- materialLeft = metal (color 0.8 0.8 0.8) g
-      -- materialRight = metal (color 0.8 0.6 0.2) g
+      materialCenter = lambertian (color 0.7 0.3 0.3) g
+      materialLeft = metal (color 0.8 0.8 0.8) g
+      materialRight = metal (color 0.8 0.6 0.2) g
       sphere1 = Sphere (point 0.0 -100.5 -1.0) 100.0 <$> materialGround :: IO Sphere
-      -- sphere2 = Sphere (point 0.0 0.0 -1.0) 0.5 materialCenter
-      -- sphere3 = Sphere (point -1.0 0.0 -1.0) 0.5 materialLeft
-      -- sphere4 = Sphere (point 1.0 0.0 -1.0) 0.5 materialRight
-      world = mkWorld [sphere1]
+      sphere2 = Sphere (point 0.0 0.0 -1.0) 0.5 <$> materialCenter :: IO Sphere
+      sphere3 = Sphere (point -1.0 0.0 -1.0) 0.5 <$> materialLeft :: IO Sphere
+      sphere4 = Sphere (point 1.0 0.0 -1.0) 0.5 <$> materialRight :: IO Sphere
+      world = mkWorld [sphere1, sphere2, sphere3, sphere4]
   generateImage imageHeight g world
 
 mkWorld :: (PrimMonad m, Hittable a) => [m a] -> m (World a)
