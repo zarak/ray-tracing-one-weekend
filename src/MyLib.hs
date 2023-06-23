@@ -81,11 +81,10 @@ someFunc = do
   g <- MWC.create -- use for testing
   putStrLn $ printf "P3\n%d %d\n255" imageWidth imageHeight
   let materialGround = lambertian (color 0.8 0.8 0) g
-      -- materialCenter = lambertian (color 0.7 0.3 0.3) g
-      materialCenter = dielectric 1.5 g
+      materialCenter = lambertian (color 0.1 0.2 0.5) g
       -- materialLeft = metal (color 0.8 0.8 0.8) 0.3 g
       materialLeft = dielectric 1.5 g
-      materialRight = metal (color 0.8 0.6 0.2) 1.0 g
+      materialRight = metal (color 0.8 0.6 0.2) 0.0 g
       sphere1 = Sphere (point 0.0 -100.5 -1.0) 100.0 <$> materialGround :: IO Sphere
       sphere2 = Sphere (point 0.0 0.0 -1.0) 0.5 <$> materialCenter :: IO Sphere
       sphere3 = Sphere (point -1.0 0.0 -1.0) 0.5 <$> materialLeft :: IO Sphere
