@@ -39,12 +39,11 @@ dielectric ir _ = do
       f rayIn hitRecord = do
         let attenuation = color 1.0 1.0 1.0
             refractionRatio =
-              if hitRecord.frontFace == Front
+              if hitRecord.face == Front
                 then 1.0 / ir
                 else ir
             unitDirection = unitVector rayIn.direction
             refracted = refract unitDirection hitRecord.normal refractionRatio
             scattered = Ray hitRecord.p refracted
         pure $ Scattered scattered attenuation
-  pure $
-    Material f
+  pure $ Material f
