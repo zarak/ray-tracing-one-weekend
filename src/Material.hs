@@ -34,7 +34,8 @@ metal albedo fuzz g = do
   pure $ Material f
 
 dielectric :: PrimMonad m => Double -> Gen (PrimState m) -> m Material
-dielectric ir _ = do
+dielectric ir g = do
+  rd <- randomDouble g
   let f :: Ray -> HitRecord -> Maybe Scattered
       f rayIn rec = do
         let attenuation = color 1.0 1.0 1.0
@@ -46,8 +47,16 @@ dielectric ir _ = do
             sinTheta = sqrt (1.0 - cosTheta * cosTheta)
             cannotRefract = refractionRatio * sinTheta > 1.0
             direction
-              | cannotRefract = reflect unitDirection rec.normal
+              | cannotRefract
+                  || reflectance cosTheta refractionRatio > rd =
+                  reflect unitDirection rec.normal
               | otherwise = refract unitDirection rec.normal refractionRatio
             scattered = Ray rec.p direction
         pure $ Scattered scattered attenuation
   pure $ Material f
+
+reflectance :: Double -> Double -> Double
+reflectance cosine refIdx =
+  let r0 = (1 - refIdx) / (1 + refIdx)
+      r0' = r0 * r0
+   in r0' + (1 - r0') * (1 - cosine) ** 5
