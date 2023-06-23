@@ -57,7 +57,7 @@ mkCamera lookfrom lookat vup vfov aspectRatio aperture focusDist =
         }
 
 getRay :: Camera -> Double -> Double -> Vec3 -> Ray
-getRay (Camera origin horizontal vertical lowerLeftCorner (CameraConfig u v w lensRadius)) s t randomVec =
+getRay (Camera origin horizontal vertical lowerLeftCorner (CameraConfig u v _ lensRadius)) s t randomVec =
   let rd = lensRadius *^ randomVec
       offset = u ^* rd.x + v ^* rd.y
    in Ray

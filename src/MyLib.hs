@@ -53,7 +53,7 @@ camera =
     lookfrom = point 3 3 2
     lookat = point 0 0 -1
     vup = Vec3 0 1 0
-    distToFocus = length (lookat |-> lookat)
+    distToFocus = length (lookat |-> lookfrom)
     aperture = 2.0
 
 rayColor :: (PrimMonad m) => Ray -> Gen (PrimState m) -> Int -> m (World Sphere) -> m Color
