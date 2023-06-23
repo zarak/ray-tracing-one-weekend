@@ -28,7 +28,7 @@ samplesPerPixel = 100
 shadowAcne :: Double
 shadowAcne = 0.001
 
-rayColor :: PrimMonad m => Ray -> Gen (PrimState m) -> Int -> World Sphere -> m Color
+rayColor :: Ray -> Gen (PrimState IO) -> Int -> IO (World Sphere) -> IO Color
 rayColor _ _ 0 _ = pure mempty
 rayColor r g depth world = do
   let unitDirection = unitVector r.direction
@@ -44,7 +44,7 @@ rayColor r g depth world = do
           c <- rayColor scattered.ray g (depth - 1) world
           pure $ Color $ scattered.attenuation.toVec3 * c.toVec3
 
-generateLine :: Int -> Gen (PrimState IO) -> World Sphere -> IO ()
+generateLine :: Int -> Gen (PrimState IO) -> IO (World Sphere) -> IO ()
 generateLine j g world = do
   sampledColors <- forM [1 .. imageWidth] $ \i -> do
     cs <- replicateM samplesPerPixel $ do
@@ -53,7 +53,7 @@ generateLine j g world = do
     pure $ writeColor summedColors samplesPerPixel
   T.putStrLn $ T.unlines sampledColors
 
-drawRay :: PrimMonad m => Int -> Int -> Gen (PrimState m) -> World Sphere -> m Color
+drawRay :: Int -> Int -> Gen (PrimState IO) -> IO (World Sphere) -> IO Color
 drawRay i j g world = do
   x <- randomDouble g
   y <- randomDouble g
@@ -64,7 +64,7 @@ drawRay i j g world = do
    in pixelColor
 
 -- Generate image (without header) and display progress
-generateImage :: Int -> Gen (PrimState IO) -> World Sphere -> IO ()
+generateImage :: Int -> Gen (PrimState IO) -> IO (World Sphere) -> IO ()
 generateImage 0 _ _ = do
   hPutStr stderr "\rScanlines remaining: 0 \nDone.\n"
   hFlush stderr
