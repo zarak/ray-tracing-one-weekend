@@ -21,8 +21,8 @@ lambertian albedo g = do
         pure $ Scattered scattered albedo
   pure $ Material f albedo
 
-metal :: Color -> Material
-metal albedo = do
+metal :: PrimMonad m => Color -> Gen (PrimState m) -> m Material
+metal albedo _ = do
   let f :: Ray -> HitRecord -> Maybe Scattered
       f rayIn hitRecord = do
         let reflected = reflect (unitVector rayIn.direction) hitRecord.normal
@@ -30,4 +30,4 @@ metal albedo = do
         if dot scattered.direction hitRecord.normal > 0
           then Just $ Scattered scattered albedo
           else Nothing
-  Material f albedo
+  pure $ Material f albedo

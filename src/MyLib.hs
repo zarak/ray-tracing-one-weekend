@@ -81,13 +81,16 @@ someFunc = do
   g <- MWC.create -- use for testing
   putStrLn $ printf "P3\n%d %d\n255" imageWidth imageHeight
   -- Bug: lambertian is not generated randomly if you extract it here
-  materialGround <- lambertian (color 0.8 0.8 0) g
-  materialCenter <- lambertian (color 0.7 0.3 0.3) g
-  let materialLeft = metal (color 0.8 0.8 0.8)
-  let materialRight = metal (color 0.8 0.6 0.2)
-      sphere1 = Sphere (point 0.0 -100.5 -1.0) 100.0 materialGround
-      sphere2 = Sphere (point 0.0 0.0 -1.0) 0.5 materialCenter
-      sphere3 = Sphere (point -1.0 0.0 -1.0) 0.5 materialLeft
-      sphere4 = Sphere (point 1.0 0.0 -1.0) 0.5 materialRight
-      world = World [sphere1, sphere2, sphere3, sphere4]
+  let materialGround = lambertian (color 0.8 0.8 0) g
+      -- materialCenter = lambertian (color 0.7 0.3 0.3) g
+      -- materialLeft = metal (color 0.8 0.8 0.8) g
+      -- materialRight = metal (color 0.8 0.6 0.2) g
+      sphere1 = Sphere (point 0.0 -100.5 -1.0) 100.0 <$> materialGround :: IO Sphere
+      -- sphere2 = Sphere (point 0.0 0.0 -1.0) 0.5 materialCenter
+      -- sphere3 = Sphere (point -1.0 0.0 -1.0) 0.5 materialLeft
+      -- sphere4 = Sphere (point 1.0 0.0 -1.0) 0.5 materialRight
+      world = mkWorld [sphere1]
   generateImage imageHeight g world
+
+mkWorld :: (PrimMonad m, Hittable a) => [m a] -> m (World a)
+mkWorld xs = World <$> sequence xs
