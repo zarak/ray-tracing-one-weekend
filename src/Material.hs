@@ -33,7 +33,18 @@ metal albedo fuzz g = do
           else Nothing
   pure $ Material f
 
--- dielectric :: PrimMonad m => Double -> Gen (PrimState m) -> m Material
--- dielectric ir _ = do
---   let attenuation = color 1.0 1.0 1.0
---   pure $ Material f attenuation
+dielectric :: PrimMonad m => Double -> Gen (PrimState m) -> m Material
+dielectric ir _ = do
+  let f :: Ray -> HitRecord -> Maybe Scattered
+      f rayIn hitRecord = do
+        let attenuation = color 1.0 1.0 1.0
+            refractionRatio =
+              if hitRecord.frontFace == Front
+                then 1.0 / ir
+                else ir
+            unitDirection = unitVector rayIn.direction
+            refracted = refract unitDirection hitRecord.normal refractionRatio
+            scattered = Ray hitRecord.p refracted
+        pure $ Scattered scattered attenuation
+  pure $
+    Material f
