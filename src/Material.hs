@@ -19,7 +19,7 @@ lambertian albedo g = do
                 else hitRecord.normal + randomVec
             scattered = Ray hitRecord.p scatterDirection
         pure $ Scattered scattered albedo
-  pure $ Material f albedo
+  pure $ Material f
 
 metal :: PrimMonad m => Color -> Double -> Gen (PrimState m) -> m Material
 metal albedo fuzz g = do
@@ -31,7 +31,7 @@ metal albedo fuzz g = do
         if dot scattered.direction hitRecord.normal > 0
           then Just $ Scattered scattered albedo
           else Nothing
-  pure $ Material f albedo
+  pure $ Material f
 
 -- dielectric :: PrimMonad m => Double -> Gen (PrimState m) -> m Material
 -- dielectric ir _ = do

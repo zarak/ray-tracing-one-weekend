@@ -19,7 +19,6 @@ data Scattered = Scattered
     attenuation :: Color
   }
 
-data Material = Material
-  { scatter :: Ray -> HitRecord -> Maybe Scattered,
-    albedo :: Color
+newtype Material = Material
+  { scatter :: Ray -> HitRecord -> Maybe Scattered
   }
