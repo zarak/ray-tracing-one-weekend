@@ -19,14 +19,15 @@ data Camera = Camera
   deriving (Show)
 
 mkCamera :: Double -> Double -> Camera
-mkCamera aspectRatio vfov =
+mkCamera vfov aspectRatio =
   let theta = degreesToRadians vfov
       h = tan $ theta / 2
       viewportHeight = 2.0 * h
       viewportWidth = aspectRatio * viewportHeight
+
       focalLength = 1.0
 
-      origin = Point $ Vec3 0 0 0
+      origin = Point zeros
       horizontal = Vec3 viewportWidth 0 0
       vertical = Vec3 0 viewportHeight 0
       lowerLeftCorner =
@@ -34,7 +35,12 @@ mkCamera aspectRatio vfov =
           - horizontal ^/ 2
           - vertical ^/ 2
           - Vec3 0 0 focalLength
-   in Camera origin lowerLeftCorner horizontal vertical
+   in Camera
+        { origin = origin,
+          horizontal = horizontal,
+          vertical = vertical,
+          lowerLeftCorner = lowerLeftCorner
+        }
 
 getRay :: Camera -> Double -> Double -> Ray
 getRay camera u v =
