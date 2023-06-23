@@ -28,7 +28,7 @@ samplesPerPixel = 100
 shadowAcne :: Double
 shadowAcne = 0.001
 
-rayColor :: Ray -> Gen (PrimState IO) -> Int -> IO (World Sphere) -> IO Color
+rayColor :: (PrimMonad m) => Ray -> Gen (PrimState m) -> Int -> m (World Sphere) -> m Color
 rayColor _ _ 0 _ = pure mempty
 rayColor r g depth worldIO = do
   let unitDirection = unitVector r.direction
@@ -46,16 +46,7 @@ rayColor r g depth worldIO = do
           c <- rayColor scattered.ray g (depth - 1) (pure world)
           pure $ Color $ scattered.attenuation.toVec3 * c.toVec3
 
-generateLine :: Int -> Gen (PrimState IO) -> IO (World Sphere) -> IO ()
-generateLine j g world = do
-  sampledColors <- forM [1 .. imageWidth] $ \i -> do
-    cs <- replicateM samplesPerPixel $ do
-      drawRay i j g world
-    let summedColors = foldr (<>) mempty cs
-    pure $ writeColor summedColors samplesPerPixel
-  T.putStrLn $ T.unlines sampledColors
-
-drawRay :: Int -> Int -> Gen (PrimState IO) -> IO (World Sphere) -> IO Color
+drawRay :: PrimMonad m => Int -> Int -> Gen (PrimState m) -> m (World Sphere) -> m Color
 drawRay i j g world = do
   x <- randomDouble g
   y <- randomDouble g
@@ -64,6 +55,15 @@ drawRay i j g world = do
       r = getRay u v
       pixelColor = rayColor r g maximumDepth world
    in pixelColor
+
+generateLine :: Int -> Gen (PrimState IO) -> IO (World Sphere) -> IO ()
+generateLine j g world = do
+  sampledColors <- forM [1 .. imageWidth] $ \i -> do
+    cs <- replicateM samplesPerPixel $ do
+      drawRay i j g world
+    let summedColors = foldr (<>) mempty cs
+    pure $ writeColor summedColors samplesPerPixel
+  T.putStrLn $ T.unlines sampledColors
 
 generateImage :: Int -> Gen (PrimState IO) -> IO (World Sphere) -> IO ()
 generateImage 0 _ _ = do
