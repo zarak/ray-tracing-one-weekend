@@ -29,14 +29,18 @@ maybeHead (x : _) = Just x
 ------------------------------------------------------------------------------
 -- Random
 ------------------------------------------------------------------------------
+-- Generates a random value in the interval [0, 1)
+randomDoubleR :: PrimMonad m => Double -> Double -> Gen (PrimState m) -> m Double
+randomDoubleR lo hi g = do
+  s <- MWC.uniformR (lo, hi) g
+  -- subtract this value to get [lo, hi) instead of (lo,hi]
+  -- See https://hackage.haskell.org/package/mwc-random-0.15.0.2/docs/src/System.Random.MWC.html#uniform
+  pure $ s - 2 ** (-53)
 
 -- Generates a random value in the interval [0, 1)
 randomDouble :: PrimMonad m => Gen (PrimState m) -> m Double
 randomDouble g = do
-  s <- MWC.uniformR (0, 1) g
-  -- subtract this value to get [0, 1) instead of (0,1]
-  -- See https://hackage.haskell.org/package/mwc-random-0.15.0.2/docs/src/System.Random.MWC.html#uniform
-  pure $ s - 2 ** (-53)
+  randomDoubleR 0 1 g
 
 randomInUnitSphere :: PrimMonad m => Gen (PrimState m) -> m Vec3
 randomInUnitSphere g = do
@@ -49,3 +53,12 @@ randomInHemisphere :: PrimMonad m => Vec3 -> Gen (PrimState m) -> m Vec3
 randomInHemisphere normal g = do
   inUnitSphere <- randomInUnitSphere g
   if dot inUnitSphere normal > 0.0 then pure inUnitSphere else pure (-inUnitSphere)
+
+randomInUnitDisk :: PrimMonad m => Gen (PrimState m) -> m Vec3
+randomInUnitDisk g = do
+  x <- randomDoubleR -1 1 g
+  y <- randomDoubleR -1 1 g
+  let p = Vec3 x y 0
+  if lengthSquared p >= 1
+    then randomInUnitSphere g
+    else pure p
