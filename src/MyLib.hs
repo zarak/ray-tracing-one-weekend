@@ -21,6 +21,7 @@ import System.Random.MWC
 import System.Random.MWC qualified as MWC
 import Text.Printf
 import Vec3
+import Prelude hiding (length)
 
 samplesPerPixel :: Int
 samplesPerPixel = 100
@@ -41,11 +42,19 @@ camera :: Camera
 -- camera = mkCamera (point -2 2 1) (point 0 0 -1) (Vec3 0 1 0) 90.0 aspectRatio
 camera =
   mkCamera
-    (point -2 2 1)
-    (point 0 0 -1)
-    (Vec3 0 1 0)
+    lookfrom
+    lookat
+    vup
     20
     aspectRatio
+    aperture
+    distToFocus
+  where
+    lookfrom = point 3 3 2
+    lookat = point 0 0 -1
+    vup = Vec3 0 1 0
+    distToFocus = length (lookat |-> lookat)
+    aperture = 2.0
 
 rayColor :: (PrimMonad m) => Ray -> Gen (PrimState m) -> Int -> m (World Sphere) -> m Color
 rayColor _ _ 0 _ = pure mempty
