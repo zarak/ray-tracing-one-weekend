@@ -21,12 +21,13 @@ lambertian albedo g = do
         pure $ Scattered scattered albedo
   pure $ Material f albedo
 
-metal :: PrimMonad m => Color -> Gen (PrimState m) -> m Material
-metal albedo _ = do
+metal :: PrimMonad m => Color -> Double -> Gen (PrimState m) -> m Material
+metal albedo fuzz g = do
+  randomVec <- randomInUnitSphere g
   let f :: Ray -> HitRecord -> Maybe Scattered
       f rayIn hitRecord = do
         let reflected = reflect (unitVector rayIn.direction) hitRecord.normal
-            scattered = Ray hitRecord.p reflected
+            scattered = Ray hitRecord.p (reflected + fuzz *^ randomVec)
         if dot scattered.direction hitRecord.normal > 0
           then Just $ Scattered scattered albedo
           else Nothing

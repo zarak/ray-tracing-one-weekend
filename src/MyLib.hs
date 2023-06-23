@@ -65,7 +65,6 @@ drawRay i j g world = do
       pixelColor = rayColor r g maximumDepth world
    in pixelColor
 
--- Generate image (without header) and display progress
 generateImage :: Int -> Gen (PrimState IO) -> IO (World Sphere) -> IO ()
 generateImage 0 _ _ = do
   hPutStr stderr "\rScanlines remaining: 0 \nDone.\n"
@@ -76,7 +75,6 @@ generateImage j g world = do
   generateLine j g world
   generateImage (j - 1) g world
 
--- Generate image with header
 someFunc :: IO ()
 someFunc = do
   -- g <- MWC.createSystemRandom
@@ -84,8 +82,8 @@ someFunc = do
   putStrLn $ printf "P3\n%d %d\n255" imageWidth imageHeight
   let materialGround = lambertian (color 0.8 0.8 0) g
       materialCenter = lambertian (color 0.7 0.3 0.3) g
-      materialLeft = metal (color 0.8 0.8 0.8) g
-      materialRight = metal (color 0.8 0.6 0.2) g
+      materialLeft = metal (color 0.8 0.8 0.8) 0.3 g
+      materialRight = metal (color 0.8 0.6 0.2) 1.0 g
       sphere1 = Sphere (point 0.0 -100.5 -1.0) 100.0 <$> materialGround :: IO Sphere
       sphere2 = Sphere (point 0.0 0.0 -1.0) 0.5 <$> materialCenter :: IO Sphere
       sphere3 = Sphere (point -1.0 0.0 -1.0) 0.5 <$> materialLeft :: IO Sphere
