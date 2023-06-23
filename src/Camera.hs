@@ -3,71 +3,52 @@
 module Camera where
 
 import Ray
+import RtWeekend
 import Vec3
 
+------------------------------------------------------------------------------
+-- Image
+------------------------------------------------------------------------------
+
 data Camera = Camera
-  { aspectRatio :: Double,
-    viewportHeight :: Double,
-    viewportWidth :: Double,
-    focalLength :: Double,
-    origin :: Point,
+  { origin :: Point,
     horizontal :: Vec3,
     vertical :: Vec3,
     lowerLeftCorner :: Vec3
   }
   deriving (Show)
 
-defaultViewportWidth :: Double
-defaultViewportWidth = defaultAspectRatio * defaultViewportHeight
+mkCamera :: Double -> Double -> Camera
+mkCamera aspectRatio vfov =
+  let theta = degreesToRadians vfov
+      h = tan $ theta / 2
+      viewportHeight = 2.0 * h
+      viewportWidth = aspectRatio * viewportHeight
+      focalLength = 1.0
 
-defaultViewportHeight :: Double
-defaultViewportHeight = 2.0
-
-defaultAspectRatio :: Double
-defaultAspectRatio = 16.0 / 9.0
-
-defaultHorizontal :: Vec3
-defaultHorizontal = Vec3 defaultViewportWidth 0 0
-
-defaultVertical :: Vec3
-defaultVertical = Vec3 0 defaultViewportHeight 0
-
-defaultFocalLength :: Double
-defaultFocalLength = 1.0
-
-defaultOrigin :: Point
-defaultOrigin = Point zeros
-
-defaultCamera :: Camera
-defaultCamera =
-  Camera
-    { aspectRatio = defaultAspectRatio,
-      viewportHeight = defaultViewportHeight,
-      viewportWidth = defaultViewportWidth,
-      focalLength = defaultFocalLength,
-      origin = defaultOrigin,
-      horizontal = defaultHorizontal,
-      vertical = defaultVertical,
+      origin = Point $ Vec3 0 0 0
+      horizontal = Vec3 viewportWidth 0 0
+      vertical = Vec3 0 viewportHeight 0
       lowerLeftCorner =
-        defaultOrigin.toVec3
-          - defaultHorizontal ^/ 2
-          - defaultVertical ^/ 2
-          - Vec3 0 0 defaultFocalLength
-    }
+        origin.toVec3
+          - horizontal ^/ 2
+          - vertical ^/ 2
+          - Vec3 0 0 focalLength
+   in Camera origin lowerLeftCorner horizontal vertical
 
-getRay :: Double -> Double -> Ray
-getRay u v =
+getRay :: Camera -> Double -> Double -> Ray
+getRay camera u v =
   Ray
-    defaultCamera.origin
+    camera.origin
     -- The direction vector of the ray goes from the origin of the camera to
     -- a point on the screen with coordinates (u, v)
     -- See https://raytracing.github.io/images/fig-1.03-cam-geom.jpg
-    ( defaultCamera.origin
+    ( camera.origin
         |-> Point
-          ( defaultCamera.lowerLeftCorner
+          ( camera.lowerLeftCorner
               + u
-              *^ defaultCamera.horizontal
+              *^ camera.horizontal
               + v
-              *^ defaultCamera.vertical
+              *^ camera.vertical
           )
     )

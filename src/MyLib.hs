@@ -28,6 +28,18 @@ samplesPerPixel = 100
 shadowAcne :: Double
 shadowAcne = 0.001
 
+aspectRatio :: Double
+aspectRatio = 16.0 / 9.0
+
+imageWidth :: Int
+imageWidth = 400
+
+imageHeight :: Int
+imageHeight = truncate $ fromIntegral imageWidth / aspectRatio
+
+camera :: Camera
+camera = mkCamera aspectRatio 1.0
+
 rayColor :: (PrimMonad m) => Ray -> Gen (PrimState m) -> Int -> m (World Sphere) -> m Color
 rayColor _ _ 0 _ = pure mempty
 rayColor r g depth worldIO = do
@@ -52,7 +64,7 @@ drawRay i j g world = do
   y <- randomDouble g
   let u = (fromIntegral i + x) / fromIntegral (imageWidth - 1)
       v = (fromIntegral j + y) / fromIntegral (imageHeight - 1)
-      r = getRay u v
+      r = getRay camera u v
       pixelColor = rayColor r g maximumDepth world
    in pixelColor
 

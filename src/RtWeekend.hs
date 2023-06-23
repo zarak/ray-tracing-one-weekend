@@ -1,6 +1,5 @@
 module RtWeekend where
 
-import Camera
 import Control.Monad.Primitive
 import System.Random.MWC
 import System.Random.MWC qualified as MWC
@@ -13,15 +12,6 @@ import Prelude hiding (length)
 
 maximumDepth :: Int
 maximumDepth = 50
-
-------------------------------------------------------------------------------
--- Image
-------------------------------------------------------------------------------
-imageWidth :: Int
-imageWidth = 400
-
-imageHeight :: Int
-imageHeight = truncate $ fromIntegral imageWidth / defaultCamera.aspectRatio
 
 ------------------------------------------------------------------------------
 -- Utility
