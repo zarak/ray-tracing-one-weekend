@@ -38,7 +38,8 @@ imageHeight :: Int
 imageHeight = truncate $ fromIntegral imageWidth / aspectRatio
 
 camera :: Camera
-camera = mkCamera (point -2 2 1) (point 0 0 -1) (Vec3 0 1 0) 90.0 aspectRatio
+-- camera = mkCamera (point -2 2 1) (point 0 0 -1) (Vec3 0 1 0) 90.0 aspectRatio
+camera = mkCamera (point -2 2 1) (point 0 0 -1) (Vec3 0 1 0) 20 aspectRatio
 
 rayColor :: (PrimMonad m) => Ray -> Gen (PrimState m) -> Int -> m (World Sphere) -> m Color
 rayColor _ _ 0 _ = pure mempty
