@@ -58,6 +58,6 @@ dielectric ir g = do
 
 reflectance :: Double -> Double -> Double
 reflectance cosine refIdx =
-  let r0 = (1 - refIdx) / (1 + refIdx)
-      r0' = r0 * r0
-   in r0' + (1 - r0') * (1 - cosine) ** 5
+  let frac = (1 - refIdx) / (1 + refIdx)
+      r0 = frac * frac
+   in r0 + (1 - r0) * (1 - cosine) ** 5
