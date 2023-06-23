@@ -103,3 +103,10 @@ nearZero (Vec3 x y z) =
 
 reflect :: Vec3 -> Vec3 -> Vec3
 reflect v normal = v - (2.0 * dot v normal) *^ normal
+
+refract :: Vec3 -> Vec3 -> Double -> Vec3
+refract uv n etaiOverEtat =
+  let cosTheta = min (dot (-uv) n) 1.0
+      rOutPerp = etaiOverEtat *^ (uv + cosTheta *^ n)
+      rOutParallel = -sqrt (abs (1.0 - lengthSquared rOutPerp)) *^ n
+   in rOutPerp + rOutParallel
