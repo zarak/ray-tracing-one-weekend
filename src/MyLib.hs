@@ -88,8 +88,9 @@ someFunc = do
       sphere1 = Sphere (point 0.0 -100.5 -1.0) 100.0 <$> materialGround :: IO Sphere
       sphere2 = Sphere (point 0.0 0.0 -1.0) 0.5 <$> materialCenter :: IO Sphere
       sphere3 = Sphere (point -1.0 0.0 -1.0) 0.5 <$> materialLeft :: IO Sphere
-      sphere4 = Sphere (point 1.0 0.0 -1.0) 0.5 <$> materialRight :: IO Sphere
-      world = mkWorld [sphere1, sphere2, sphere3, sphere4]
+      sphere4 = Sphere (point -1.0 0.0 -1.0) -0.4 <$> materialLeft :: IO Sphere
+      sphere5 = Sphere (point 1.0 0.0 -1.0) 0.5 <$> materialRight :: IO Sphere
+      world = mkWorld [sphere1, sphere2, sphere3, sphere4, sphere5]
   generateImage imageHeight g world
 
 mkWorld :: (PrimMonad m, Hittable a) => [m a] -> m (World a)

@@ -38,10 +38,11 @@ dielectric ir g = do
   rd <- randomDouble g
   let f :: Ray -> HitRecord -> Maybe Scattered
       f rayIn rec = do
-        let attenuation = color 1.0 1.0 1.0
-            refractionRatio
-              | rec.face == Front = 1.0 / ir
-              | otherwise = ir
+        let attenuation = white
+            refractionRatio =
+              case rec.face of
+                Front -> 1.0 / ir
+                Back -> ir
             unitDirection = unitVector rayIn.direction
             cosTheta = min (dot (-unitDirection) rec.normal) 1.0
             sinTheta = sqrt (1.0 - cosTheta * cosTheta)
