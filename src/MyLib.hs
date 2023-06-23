@@ -39,7 +39,13 @@ imageHeight = truncate $ fromIntegral imageWidth / aspectRatio
 
 camera :: Camera
 -- camera = mkCamera (point -2 2 1) (point 0 0 -1) (Vec3 0 1 0) 90.0 aspectRatio
-camera = mkCamera (point -2 2 1) (point 0 0 -1) (Vec3 0 1 0) 20 aspectRatio
+camera =
+  mkCamera
+    (point -2 2 1)
+    (point 0 0 -1)
+    (Vec3 0 1 0)
+    20
+    aspectRatio
 
 rayColor :: (PrimMonad m) => Ray -> Gen (PrimState m) -> Int -> m (World Sphere) -> m Color
 rayColor _ _ 0 _ = pure mempty
@@ -63,9 +69,10 @@ drawRay :: PrimMonad m => Int -> Int -> Gen (PrimState m) -> m (World Sphere) ->
 drawRay i j g world = do
   x <- randomDouble g
   y <- randomDouble g
+  randomInDisk <- randomInUnitDisk g
   let u = (fromIntegral i + x) / fromIntegral (imageWidth - 1)
       v = (fromIntegral j + y) / fromIntegral (imageHeight - 1)
-      r = getRay camera u v
+      r = getRay camera u v randomInDisk
       pixelColor = rayColor r g maximumDepth world
    in pixelColor
 
