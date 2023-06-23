@@ -38,7 +38,7 @@ imageHeight :: Int
 imageHeight = truncate $ fromIntegral imageWidth / aspectRatio
 
 camera :: Camera
-camera = mkCamera 90.0 aspectRatio
+camera = mkCamera (point -2 2 1) (point 0 0 -1) (Vec3 0 1 0) 90.0 aspectRatio
 
 rayColor :: (PrimMonad m) => Ray -> Gen (PrimState m) -> Int -> m (World Sphere) -> m Color
 rayColor _ _ 0 _ = pure mempty
@@ -92,12 +92,18 @@ someFunc = do
   -- g <- MWC.createSystemRandom
   g <- MWC.create -- use for testing
   putStrLn $ printf "P3\n%d %d\n255" imageWidth imageHeight
-  let r = cos (pi / 4)
-  let materialLeft = lambertian (color 0 0 1) g
-      materialRight = lambertian (color 1 0 0) g
-      sphere1 = Sphere (point (-r) 0.0 -1) r <$> materialLeft :: IO Sphere
-      sphere2 = Sphere (point r 0.0 -1.0) r <$> materialRight :: IO Sphere
-      world = mkWorld [sphere1, sphere2]
+  let -- placeholder
+      materialGround = lambertian (color 0.8 0.8 0) g
+      materialCenter = lambertian (color 0.1 0.2 0.5) g
+      materialLeft = dielectric 1.5 g
+      materialRight = metal (color 0.8 0.6 0.2) 0.0 g
+
+      sphere1 = Sphere (point 0.0 -100.5 -1.0) 100.0 <$> materialGround :: IO Sphere
+      sphere2 = Sphere (point 0.0 0.0 -1.0) 0.5 <$> materialCenter :: IO Sphere
+      sphere3 = Sphere (point -1.0 0.0 -1.0) 0.5 <$> materialLeft :: IO Sphere
+      sphere4 = Sphere (point -1.0 0.0 -1.0) -0.45 <$> materialLeft :: IO Sphere
+      sphere5 = Sphere (point 1.0 0.0 -1.0) 0.5 <$> materialRight :: IO Sphere
+      world = mkWorld [sphere1, sphere2, sphere3, sphere4, sphere5]
   generateImage imageHeight g world
 
 mkWorld :: (PrimMonad m, Hittable a) => [m a] -> m (World a)

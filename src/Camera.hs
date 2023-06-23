@@ -32,6 +32,7 @@ mkCamera lookfrom lookat vup vfov aspectRatio =
         origin.toVec3
           - horizontal ^/ 2
           - vertical ^/ 2
+          - w
    in Camera
         { origin = origin,
           horizontal = horizontal,
