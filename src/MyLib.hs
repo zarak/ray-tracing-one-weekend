@@ -111,46 +111,49 @@ someFunc = do
   g <- MWC.create -- use for testing
   putStrLn $ printf "P3\n%d %d\n255" imageWidth imageHeight
   let -- placeholder
-      world = randomScene g
+
+  world <- mkWorld <$> randomScene g
   generateImage imageHeight g world
 
--- mkWorld :: (PrimMonad m, Hittable a) => [m a] -> m (World a)
--- mkWorld xs = World <$> sequence xs
+mkWorld :: (PrimMonad m, Hittable a) => [m a] -> m (World a)
+mkWorld xs = World <$> sequence xs
 
-randomScene :: PrimMonad m => Gen (PrimState m) -> m (World Sphere)
+randomScene :: Gen (PrimState IO) -> IO [IO Sphere]
 randomScene g = do
   let groundMaterial = lambertian (color 0.5 0.5 0.5) g
-  largeSphere <- Sphere (point 0 (-1000) 0) 1000 <$> groundMaterial
+      largeSphere = Sphere (point 0 (-1000) 0) 1000 <$> groundMaterial :: IO Sphere
 
-  smallSpheres <- forM [(a, b) | a <- [-11 .. 10 :: Int], b <- [-11 .. 10 :: Int]] $ \(a, b) -> do
-    chooseMat <- randomDouble g
-    let center = point (fromIntegral a + 0.9 * chooseMat) 0.2 (fromIntegral b + 0.9 * chooseMat)
-    if length (point 4 0.2 0 |-> center) > 0.9
-      then do
-        sphereMaterial <-
-          if chooseMat < 0.8
+  smallSpheres <-
+    fmap catMaybes . sequence $
+      [ do
+          chooseMat <- randomDouble g
+          let center = point (fromIntegral a + 0.9 * chooseMat) 0.2 (fromIntegral b + 0.9 * chooseMat)
+          if length (point 4 0.2 0 |-> center) > 0.9
             then do
-              -- diffuse
-              albedo <- (*) <$> uniformM g <*> uniformM g
-              lambertian (Color albedo) g
-            else
-              if chooseMat < 0.95
-                then do
-                  -- metal
-                  albedo <- Color <$> uniformRM (0.5, 1) g
-                  fuzz <- randomDoubleR 0 0.5 g
-                  metal albedo fuzz g
-                else do
-                  -- glass
-                  dielectric 1.5 g
-        pure $ Just $ Sphere center 0.2 sphereMaterial
-      else pure Nothing
+              sphereMaterial <-
+                if chooseMat < 0.8
+                  then do
+                    albedo <- (*) <$> uniformM g <*> uniformM g
+                    lambertian (Color albedo) g
+                  else
+                    if chooseMat < 0.95
+                      then do
+                        albedo <- Color <$> uniformRM (0.5, 1) g
+                        fuzz <- randomDoubleR 0 0.5 g
+                        metal albedo fuzz g
+                      else do
+                        dielectric 1.5 g
+              pure $ Just $ pure (Sphere center 0.2 sphereMaterial)
+            else pure Nothing
+        | a <- [-11 .. 10 :: Int],
+          b <- [-11 .. 10 :: Int]
+      ]
 
   let material1 = dielectric 1.5 g
-  sphere1 <- Sphere (point 0 1 0) 1.0 <$> material1
+      sphere1 = Sphere (point 0 1 0) 1.0 <$> material1 :: IO Sphere
   let material2 = lambertian (color 0.4 0.2 0.1) g
-  sphere2 <- Sphere (point (-4) 1 0) 1.0 <$> material2
+      sphere2 = Sphere (point (-4) 1 0) 1.0 <$> material2 :: IO Sphere
   let material3 = metal (color 0.7 0.6 0.5) 0.0 g
-  sphere3 <- Sphere (point 4 1 0) 1.0 <$> material3
+      sphere3 = Sphere (point 4 1 0) 1.0 <$> material3 :: IO Sphere
 
-  pure $ World $ largeSphere : sphere1 : sphere2 : sphere3 : catMaybes smallSpheres
+  pure $ largeSphere : sphere1 : sphere2 : sphere3 : smallSpheres

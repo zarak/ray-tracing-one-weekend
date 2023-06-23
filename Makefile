@@ -1,4 +1,4 @@
-test: build
+test:
 	cabal test --test-show-details=direct
 
 clean:
@@ -8,7 +8,7 @@ run:
 	cabal run
 
 build:
-	cabal build
+	cabal build --ghc-options="-O2"
 
 prof:
 	cabal run ray-tracing-one-weekend --enable-profiling -- +RTS -P
