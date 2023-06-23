@@ -32,3 +32,8 @@ metal albedo fuzz g = do
           then Just $ Scattered scattered albedo
           else Nothing
   pure $ Material f albedo
+
+-- dielectric :: PrimMonad m => Double -> Gen (PrimState m) -> m Material
+-- dielectric ir _ = do
+--   let attenuation = color 1.0 1.0 1.0
+--   pure $ Material f attenuation
