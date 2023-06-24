@@ -1,7 +1,12 @@
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE StandaloneDeriving #-}
 
 module Vec3 where
 
+import Control.DeepSeq (NFData)
+import GHC.Generics (Generic)
 import System.Random.MWC (Uniform, UniformRange (uniformRM))
 import System.Random.Stateful (Uniform (..))
 import Prelude hiding (length)
@@ -21,6 +26,10 @@ data Vec3 = Vec3
     z :: Double
   }
   deriving (Show, Eq)
+
+deriving instance Generic Vec3
+
+deriving instance NFData Vec3
 
 instance Num Vec3 where
   v + w = Vec3 (v.x + w.x) (v.y + w.y) (v.z + w.z)

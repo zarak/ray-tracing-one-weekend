@@ -1,8 +1,14 @@
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE StandaloneDeriving #-}
+
 module Color where
 
+import Control.DeepSeq (NFData)
 import Data.Text (Text)
 import Data.Text.Format (format)
 import Data.Text.Lazy (toStrict)
+import GHC.Generics (Generic)
 import RtWeekend
 import Vec3
 
@@ -16,6 +22,10 @@ newtype Color = Color
   { toVec3 :: Vec3
   }
   deriving (Show, Num)
+
+deriving instance Generic Color
+
+deriving instance NFData Color
 
 instance Semigroup Color where
   c1 <> c2 = Color $ c1.toVec3 + c2.toVec3
