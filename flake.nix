@@ -22,6 +22,8 @@
 
         # DON'T FORGET TO PUT YOUR PACKAGE NAME HERE, REMOVING `throw`
         packageName = "ray-tracing-one-weekend";
+
+        jailbrokenThreadscope = jailbreakUnbreak haskellPackages.threadscope;
       in
       {
         packages.${packageName} =
@@ -36,7 +38,7 @@
           buildInputs = with pkgs; [
             haskellPackages.haskell-language-server # you must build it with your ghc to work
             haskellPackages.hspec-discover
-            haskellPackages.threadscope
+            jailbrokenThreadscope
             ghcid
             cabal-install
           ];
