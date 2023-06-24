@@ -78,6 +78,7 @@ v ^/ t = scaleDiv v t
 infixl 7 ^/
 
 (|->) :: StartPoint -> EndPoint -> Vec3
+{-# INLINE (|->) #-}
 p1 |-> p2 = p2.toVec3 - p1.toVec3
 
 infix 6 |->

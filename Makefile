@@ -11,7 +11,7 @@ build:
 	cabal build --ghc-options="-O2"
 
 prof:
-	cabal run ray-tracing-one-weekend --enable-profiling -- +RTS -P
+	cabal run ray-tracing-one-weekend --ghc-options="-O2" --enable-profiling -- +RTS -P
 
 heap:
-	cabal run ray-tracing-one-weekend --enable-profiling -- +RTS -hc
+	cabal run ray-tracing-one-weekend --ghc-options="-O2" --enable-profiling -- +RTS -hc
