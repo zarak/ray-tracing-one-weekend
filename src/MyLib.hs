@@ -25,16 +25,16 @@ import Vec3
 import Prelude hiding (length)
 
 samplesPerPixel :: Int
-samplesPerPixel = 500
+samplesPerPixel = 100
 
 shadowAcne :: Double
 shadowAcne = 0.001
 
 aspectRatio :: Double
-aspectRatio = 3.0 / 2.0
+aspectRatio = 16.0 / 9.0
 
 imageWidth :: Int
-imageWidth = 1200
+imageWidth = 40
 
 imageHeight :: Int
 imageHeight = truncate $ fromIntegral imageWidth / aspectRatio
