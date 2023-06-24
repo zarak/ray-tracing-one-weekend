@@ -89,8 +89,7 @@ drawRay i j g world = do
 generateLine :: Int -> Gen (PrimState IO) -> IO (World Sphere) -> IO ()
 generateLine j g world = do
   sampledColors <- forM [1 .. imageWidth] $ \i -> do
-    cs <- replicateM samplesPerPixel $ do
-      drawRay i j g world
+    cs <- replicateM samplesPerPixel $ drawRay i j g world
     let summedColors = foldr (<>) mempty cs
     pure $ writeColor summedColors samplesPerPixel
   T.putStrLn $ T.unlines sampledColors

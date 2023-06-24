@@ -1,6 +1,5 @@
 module Hittable where
 
-import Control.Monad.Primitive
 import MaterialHit
 import Ray
 import Vec3
