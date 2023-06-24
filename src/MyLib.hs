@@ -22,7 +22,6 @@ import System.Random.MWC
 import System.Random.MWC qualified as MWC
 import Text.Printf
 import Vec3
-import Prelude hiding (length)
 
 samplesPerPixel :: Int
 samplesPerPixel = 100
@@ -127,7 +126,7 @@ randomScene g = do
       [ do
           chooseMat <- randomDouble g
           let center = point (fromIntegral a + 0.9 * chooseMat) 0.2 (fromIntegral b + 0.9 * chooseMat)
-          if length (point 4 0.2 0 |-> center) > 0.9
+          if Vec3.length (point 4 0.2 0 |-> center) > 0.9
             then do
               sphereMaterial <-
                 if chooseMat < 0.8
