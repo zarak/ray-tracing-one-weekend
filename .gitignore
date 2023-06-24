@@ -2,6 +2,7 @@
 *.ppm
 *.png 
 *.ps
+!images/final.png
 
 dist
 dist-*
