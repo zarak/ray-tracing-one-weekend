@@ -7,7 +7,7 @@ import Camera
 import Color (Color (..), color, scaleColor, white, writeColor)
 import Control.Monad (forM, replicateM)
 import Control.Monad.Primitive
-import Control.Parallel.Strategies (parBuffer, rdeepseq, withStrategy)
+import Control.Parallel.Strategies (parBuffer, rdeepseq, rseq, withStrategy)
 import Data.Maybe (catMaybes)
 import Data.Text qualified as T
 import Data.Text.IO qualified as T (putStrLn)
@@ -92,7 +92,7 @@ generateLine j g world = do
     cs <- replicateM samplesPerPixel $ drawRay i j g world
     let summedColors = foldr (<>) mempty cs
     pure $ writeColor summedColors samplesPerPixel
-  T.putStrLn $ T.unlines $ withStrategy (parBuffer 100 rdeepseq) sampledColors
+  T.putStrLn $ T.unlines sampledColors
 
 generateImage :: Int -> Gen (PrimState IO) -> IO (World Sphere) -> IO ()
 generateImage 0 _ _ = do

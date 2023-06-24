@@ -5,7 +5,7 @@ clean:
 	rm -rf dist
 
 run:
-	cabal run ray-tracing-one-weekend --ghc-options="-threaded -eventlog -O2" -- +RTS -N -s -RTS
+	cabal run ray-tracing-one-weekend --ghc-options="-threaded -eventlog -O2 -rtsopts" -- +RTS -N -ls -RTS
 
 build:
 	cabal build --ghc-options="-O2 -threaded -rtsopts -eventlog"
