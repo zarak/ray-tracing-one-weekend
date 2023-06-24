@@ -2,7 +2,6 @@
 
 module Sphere where
 
-import Control.DeepSeq (force)
 import Hittable
 import MaterialHit
 import Ray
@@ -19,13 +18,13 @@ instance Hittable Sphere where
     -- P(t), our ray, in parametric form is A + tb from the notation in the book.
     -- A is the source of the ray, and b is the direction vector.
     -- In our code, A is ray.base, and b is ray.direction
-    let oc = force $ sphere.center |-> ray.base
-        a = force $ dot ray.direction ray.direction
-        halfB = force $ dot oc ray.direction
-        c = force $ lengthSquared oc - sphere.radius * sphere.radius
-        discriminant = force $ halfB * halfB - a * c
-        sqrtd = force $ sqrt discriminant
-    root <- force $ findNearestRoot halfB sqrtd a (tmin, tmax)
+    let oc = sphere.center |-> ray.base
+        a = dot ray.direction ray.direction
+        halfB = dot oc ray.direction
+        c = lengthSquared oc - sphere.radius * sphere.radius
+        discriminant = halfB * halfB - a * c
+        sqrtd = sqrt discriminant
+    root <- findNearestRoot halfB sqrtd a (tmin, tmax)
     let t = root
         p = Point $ ray `at` t
         outwardNormal = (sphere.center |-> p) ^/ sphere.radius

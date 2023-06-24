@@ -86,3 +86,53 @@ uniformRM          Vec3      src/Vec3.hs:(39,3)-(43,21)         0.8    1.4    41
 metal              Material  src/Material.hs:(25,1)-(34,19)     0.5    1.5    272 571762984
 randomScene        MyLib     src/MyLib.hs:(121,1)-(158,65)      0.2    3.6     97 1351965112
 ```
+
+
+### Strictness annotations 
+
+
+```haskell
+data Vec3 = Vec3
+  { x :: !Double,
+    y :: !Double,
+    z :: !Double
+  }
+  deriving (Show, Eq)
+
+data Sphere = Sphere
+  { center :: !Point,
+    radius :: !Double,
+    material :: !Material
+  }
+```
+
+Result
+```
+	Sat Jun 24 15:23 2023 Time and Allocation Profiling Report  (Final)
+
+	   ray-tracing-one-weekend +RTS -P -RTS
+
+	total time  =       60.92 secs   (60922 ticks @ 1000 us, 1 processor)
+	total alloc = 44,468,304,240 bytes  (excludes profiling overheads)
+
+COST CENTRE        MODULE    SRC                              %time %alloc  ticks     bytes
+
+hit                Sphere    src/Sphere.hs:(17,3)-(42,13)      45.4    0.1  27658  57025864
+-                  Vec3      src/Vec3.hs:36:3-50               13.6   12.7   8255 5634053728
+hit.oc             Sphere    src/Sphere.hs:21:9-39              7.5   37.9   4556 16847195904
+findNearestRoot    Sphere    src/Sphere.hs:(47,1)-(54,47)       6.8    0.0   4122   6912240
+lengthSquared      Vec3      src/Vec3.hs:66:1-51                4.0   12.7   2434 5628614384
+hit.c              Sphere    src/Sphere.hs:24:9-60              3.8    4.2   2295 1871910656
+hit.a              Sphere    src/Sphere.hs:22:9-43              3.1    4.2   1862 1871910656
+hit                Sphere    src/Sphere.hs:(59,3)-(72,54)       2.2    2.7   1313 1189647816
+$sel:center:Sphere Sphere    src/Sphere.hs:11:5-10              2.1    0.0   1272         0
+hit.halfB          Sphere    src/Sphere.hs:23:9-36              2.0    4.2   1224 1871910656
+base               Ray       src/Ray.hs:6:5-8                   1.6    0.0    949         0
+randomInUnitSphere RtWeekend src/RtWeekend.hs:(46,1)-(50,15)    1.3    3.8    774 1694182016
+randomDoubleR      RtWeekend src/RtWeekend.hs:(34,1)-(38,23)    1.1    2.2    688 956636776
+lambertian         Material  src/Material.hs:(12,1)-(22,19)     1.0    2.6    601 1151823304
+randomScene        MyLib     src/MyLib.hs:(121,1)-(158,65)      1.0    6.1    599 2703645080
+mkWorld            MyLib     src/MyLib.hs:118:1-34              0.8    2.3    465 1022208000
+uniformRM          Vec3      src/Vec3.hs:(47,3)-(51,21)         0.7    1.2    426 533407816
+metal              Material  src/Material.hs:(25,1)-(34,19)     0.4    1.3    252 571762984
+```
