@@ -2,7 +2,7 @@
 
 {-# HLINT ignore "Use fold" #-}
 {-# HLINT ignore "Redundant pure" #-}
-module MyLib (someFunc, rayColor, generateLine) where
+module MyLib (someFunc, rayColor, generateLine, randomScene) where
 
 import Camera
 import Color (Color (..), color, scaleColor, white, writeColor)
