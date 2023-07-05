@@ -1,4 +1,4 @@
-test:
+test: build
 	cabal test --test-show-details=direct
 
 clean:
