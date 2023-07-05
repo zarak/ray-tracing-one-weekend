@@ -69,8 +69,8 @@ rayColor r g depth world = do
   case hit world r (shadowAcne, fromRational infinity) of
     Nothing -> pure blueWhiteLerp
     Just rec -> do
-      x <- rec.material.scatter g r rec
-      case x of
+      mScattered <- rec.material.scatter g r rec
+      case mScattered of
         Nothing -> pure mempty
         Just scattered -> do
           c <- rayColor scattered.ray g (depth - 1) world
