@@ -1,13 +1,14 @@
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 
 {-# HLINT ignore "Use fold" #-}
+{-# HLINT ignore "Redundant pure" #-}
 module MyLib (someFunc, rayColor, generateLine) where
 
 import Camera
 import Color (Color (..), color, scaleColor, white, writeColor)
 import Control.Monad (forM, replicateM)
 import Control.Monad.Primitive
-import Control.Parallel.Strategies (parBuffer, rdeepseq, rseq, withStrategy)
+-- import Control.Parallel.Strategies (parBuffer, rdeepseq, rseq, withStrategy)
 import Data.Maybe (catMaybes)
 import Data.Text qualified as T
 import Data.Text.IO qualified as T (putStrLn)
@@ -82,9 +83,9 @@ drawRay i j g world = do
   randomInDisk <- randomInUnitDisk g
   let u = (fromIntegral i + x) / fromIntegral (imageWidth - 1)
       v = (fromIntegral j + y) / fromIntegral (imageHeight - 1)
-      r = getRay camera u v randomInDisk
-      pixelColor = rayColor r g maximumDepth world
-   in pixelColor
+      r = cameraRay camera u v randomInDisk
+  pixelColor <- rayColor r g maximumDepth world
+  pure pixelColor
 
 generateLine :: Int -> Gen (PrimState IO) -> IO (World Sphere) -> IO ()
 generateLine j g world = do

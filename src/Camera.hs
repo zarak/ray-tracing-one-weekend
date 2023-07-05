@@ -1,4 +1,5 @@
 {-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE RecordWildCards #-}
 
 module Camera where
 
@@ -11,12 +12,8 @@ data Camera = Camera
     horizontal :: Vec3,
     vertical :: Vec3,
     lowerLeftCorner :: Vec3,
-    config :: CameraConfig
-  }
-  deriving (Show)
-
-data CameraConfig = CameraConfig
-  { u :: Vec3,
+    -- u, v, w are basis vectors
+    u :: Vec3,
     v :: Vec3,
     w :: Vec3,
     lensRadius :: Double
@@ -47,27 +44,21 @@ mkCamera lookfrom lookat vup vfov aspectRatio aperture focusDist =
           *^ w
 
       lensRadius = aperture / 2
-      cameraConfig = CameraConfig {u = u, v = v, w = w, lensRadius = lensRadius}
-   in Camera
-        { origin = origin,
-          horizontal = horizontal,
-          vertical = vertical,
-          lowerLeftCorner = lowerLeftCorner,
-          config = cameraConfig
-        }
+   in Camera {..}
 
-getRay :: Camera -> Double -> Double -> Vec3 -> Ray
-getRay (Camera origin horizontal vertical lowerLeftCorner (CameraConfig u v _ lensRadius)) s t randomVec =
+cameraRay :: Camera -> Double -> Double -> Vec3 -> Ray
+cameraRay (Camera origin horizontal vertical lowerLeftCorner u v _ lensRadius) s t randomVec =
   let rd = lensRadius *^ randomVec
       offset = u ^* rd.x + v ^* rd.y
    in Ray
-        (Point $ origin.toVec3 + offset)
-        ( ( lowerLeftCorner
-              + s
-              *^ horizontal
-              + t
-              *^ vertical
-          )
-            - origin.toVec3
-            - offset
-        )
+        { base = Point $ origin.toVec3 + offset,
+          direction =
+            ( lowerLeftCorner
+                + s
+                *^ horizontal
+                + t
+                *^ vertical
+            )
+              - origin.toVec3
+              - offset
+        }
