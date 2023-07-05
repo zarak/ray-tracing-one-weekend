@@ -4,7 +4,8 @@ import Vec3
 
 data Ray = Ray
   { base :: Point,
-    direction :: Vec3
+    direction :: Vec3,
+    time :: Double
   }
   deriving (Show)
 

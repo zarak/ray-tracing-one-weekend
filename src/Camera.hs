@@ -5,6 +5,7 @@ module Camera where
 
 import Ray
 import RtWeekend
+import System.Random.MWC (GenIO)
 import Vec3
 
 data Camera = Camera
@@ -16,12 +17,14 @@ data Camera = Camera
     u :: Vec3,
     v :: Vec3,
     w :: Vec3,
-    lensRadius :: Double
+    lensRadius :: Double,
+    time0 :: Double,
+    time1 :: Double
   }
   deriving (Show)
 
-mkCamera :: Point -> Point -> Vec3 -> Double -> Double -> Double -> Double -> Camera
-mkCamera lookfrom lookat vup vfov aspectRatio aperture focusDist =
+mkCamera :: Point -> Point -> Vec3 -> Double -> Double -> Double -> Double -> Double -> Double -> Camera
+mkCamera lookfrom lookat vup vfov aspectRatio aperture focusDist time0 time1 =
   let theta = degreesToRadians vfov
       h = tan $ theta / 2
       viewportHeight = 2.0 * h
@@ -47,19 +50,23 @@ mkCamera lookfrom lookat vup vfov aspectRatio aperture focusDist =
       lensRadius = aperture / 2
    in Camera {..}
 
-cameraRay :: Camera -> Double -> Double -> Vec3 -> Ray
-cameraRay Camera {..} s t randomInUnitDisk_ =
+cameraRay :: Camera -> Double -> Double -> GenIO -> IO Ray
+cameraRay Camera {..} s t g = do
+  time <- randomDoubleR time0 time1 g
+  randomInUnitDisk_ <- randomInUnitDisk g
   let rd = lensRadius *^ randomInUnitDisk_
       offset = u ^* rd.x + v ^* rd.y
-   in Ray
-        { base = Point $ origin.toVec3 + offset,
-          direction =
-            ( lowerLeftCorner
-                + s
-                *^ horizontal
-                + t
-                *^ vertical
-            )
-              - origin.toVec3
-              - offset
-        }
+  pure $
+    Ray
+      { base = Point $ origin.toVec3 + offset,
+        direction =
+          ( lowerLeftCorner
+              + s
+              *^ horizontal
+              + t
+              *^ vertical
+          )
+            - origin.toVec3
+            - offset,
+        time = time
+      }
