@@ -27,6 +27,7 @@ mkCamera lookfrom lookat vup vfov aspectRatio aperture focusDist =
       viewportHeight = 2.0 * h
       viewportWidth = aspectRatio * viewportHeight
 
+      -- Camera fields below
       w = unitVector $ lookat |-> lookfrom
       u = unitVector $ cross vup w
       v = cross w u
