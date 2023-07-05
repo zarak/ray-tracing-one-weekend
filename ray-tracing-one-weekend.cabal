@@ -24,6 +24,7 @@ library
                     , Ray
                     , Hittable
                     , Sphere
+                    , MovingSphere
                     , RtWeekend
                     , Camera
                     , Material 

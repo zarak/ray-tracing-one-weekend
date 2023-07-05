@@ -27,9 +27,6 @@ center ms time =
 instance Hittable MovingSphere where
   {-# INLINEABLE hit #-}
   hit ms ray (tmin, tmax) = do
-    -- P(t), our ray, in parametric form is A + tb from the notation in the book.
-    -- A is the source of the ray, and b is the direction vector.
-    -- In our code, A is ray.base, and b is ray.direction
     let oc = (center ms ray.time) |-> ray.base
         a = dot ray.direction ray.direction
         halfB = dot oc ray.direction

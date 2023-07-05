@@ -10,13 +10,13 @@ import Vec3
 lambertian :: Color -> Material
 lambertian albedo =
   let f :: GenIO -> Ray -> HitRecord -> IO (Maybe Scattered)
-      f g _ hitRecord = do
+      f g rayIn hitRecord = do
         randomVec <- unitVector <$> randomInUnitSphere g
         let scatterDirection =
               if nearZero $ hitRecord.normal + randomVec
                 then hitRecord.normal
                 else hitRecord.normal + randomVec
-            scattered = Ray hitRecord.p scatterDirection
+            scattered = Ray hitRecord.p scatterDirection rayIn.time
         pure $ Just $ Scattered scattered albedo
    in Material f
 
@@ -26,7 +26,7 @@ metal albedo fuzz =
       f g rayIn hitRecord = do
         randomVec <- randomInUnitSphere g
         let reflected = reflect (unitVector rayIn.direction) hitRecord.normal
-            scattered = Ray hitRecord.p (reflected + fuzz *^ randomVec)
+            scattered = Ray hitRecord.p (reflected + fuzz *^ randomVec) rayIn.time
         if dot scattered.direction hitRecord.normal > 0
           then pure $ Just $ Scattered scattered albedo
           else pure Nothing
@@ -51,7 +51,7 @@ dielectric ir =
                   || reflectance cosTheta refractionRatio > rd =
                   reflect unitDirection rec.normal
               | otherwise = refract unitDirection rec.normal refractionRatio
-            scattered = Ray rec.p direction
+            scattered = Ray rec.p direction rayIn.time
         pure $ Just $ Scattered scattered attenuation
    in Material f
 
