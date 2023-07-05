@@ -2,6 +2,7 @@ module MaterialHit where
 
 import Color
 import Ray
+import System.Random.MWC (GenIO)
 import Vec3
 
 data Face = Front | Back deriving (Eq, Show, Enum)
@@ -20,5 +21,5 @@ data Scattered = Scattered
   }
 
 newtype Material = Material
-  { scatter :: Ray -> HitRecord -> Maybe Scattered
+  { scatter :: GenIO -> Ray -> HitRecord -> IO (Maybe Scattered)
   }

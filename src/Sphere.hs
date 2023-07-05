@@ -14,6 +14,7 @@ data Sphere = Sphere
   }
 
 instance Hittable Sphere where
+  {-# INLINEABLE hit #-}
   hit sphere ray (tmin, tmax) = do
     -- P(t), our ray, in parametric form is A + tb from the notation in the book.
     -- A is the source of the ray, and b is the direction vector.
@@ -56,6 +57,7 @@ findNearestRoot halfB sqrtd a (tmin, tmax)
 newtype World a = World [a]
 
 instance Hittable a => Hittable (World a) where
+  {-# INLINEABLE hit #-}
   hit (World []) _ _ = Nothing
   hit (World (h : hs)) ray range =
     case hit h ray range of
