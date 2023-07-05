@@ -16,6 +16,7 @@ import GHC.Real (infinity)
 import Hittable
 import Material
 import MaterialHit
+import MovingSphere (MovingSphere (..))
 import Ray
 import RtWeekend
 import Sphere
@@ -35,7 +36,7 @@ aspectRatio :: Double
 aspectRatio = 16.0 / 9.0
 
 imageWidth :: Int
-imageWidth = 200
+imageWidth = 400
 
 imageHeight :: Int
 imageHeight = truncate $ fromIntegral imageWidth / aspectRatio
@@ -51,12 +52,16 @@ camera =
     aspectRatio
     aperture
     distToFocus
+    time0
+    time1
   where
     lookfrom = point 13 2 3
     lookat = Point zeros
     vup = Vec3 0 1 0
     distToFocus = 10.0
     aperture = 0.1
+    time0 = 0.0
+    time1 = 1.0
 
 rayColor :: Ray -> GenIO -> Int -> World Sphere -> IO Color
 rayColor _ _ 0 _ = pure mempty
@@ -80,10 +85,9 @@ drawRay :: Int -> Int -> GenIO -> World Sphere -> IO Color
 drawRay i j g world = do
   x <- randomDouble g
   y <- randomDouble g
-  randomInDisk <- randomInUnitDisk g
   let u = (fromIntegral i + x) / fromIntegral (imageWidth - 1)
       v = (fromIntegral j + y) / fromIntegral (imageHeight - 1)
-      r = cameraRay camera u v randomInDisk
+  r <- cameraRay camera u v g
   pixelColor <- rayColor r g maximumDepth world
   pure pixelColor
 
@@ -125,25 +129,25 @@ randomScene g = do
             let center = point (fromIntegral a + 0.9 * chooseMat) 0.2 (fromIntegral b + 0.9 * chooseMat)
             if Vec3.length (point 4 0.2 0 |-> center) > 0.9
               then do
-                sphereMaterial <-
-                  if chooseMat < 0.8
-                    then do
-                      albedo <- (*) <$> uniformM g <*> uniformM g
-                      pure $ lambertian (Color albedo)
-                    else
-                      if chooseMat < 0.95
-                        then do
-                          albedo <- Color <$> uniformRM (0.5, 1) g
-                          fuzz <- randomDoubleR 0 0.5 g
-                          pure $ metal albedo fuzz
-                        else do
-                          pure $ dielectric 1.5
-                pure $ Just (Sphere center 0.2 sphereMaterial)
+                if chooseMat < 0.8
+                  then do
+                    albedo <- (*) <$> uniformM g <*> uniformM g
+                    let material = lambertian (Color albedo)
+                        -- center2 <- point3 <$> pure 0 <*> randomDoubleR 0 0.5 g <*> pure 0
+                        center2 = Point $ Vec3 0 0 0
+                    pure $ Just (MovingSphere center center2 0.0 1.0 0.2 material)
+                  else
+                    if chooseMat < 0.95
+                      then do
+                        albedo <- Color <$> uniformRM (0.5, 1) g
+                        fuzz <- randomDoubleR 0 0.5 g
+                        pure $ Just (Sphere center 0.2 (metal albedo fuzz))
+                      else do
+                        pure $ Just (Sphere center 0.2 (dielectric 1.5))
               else pure Nothing
           | a <- [-11 .. 10 :: Int],
             b <- [-11 .. 10 :: Int]
-        ] ::
-          [IO (Maybe Sphere)]
+        ]
       )
 
   let material1 = dielectric 1.5
