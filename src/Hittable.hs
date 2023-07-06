@@ -23,3 +23,8 @@ setFaceNormal r outwardNormal
   | otherwise = (Back, -outwardNormal)
   where
     isRayOutside = dot r.direction outwardNormal < 0
+
+data AnyHittable = forall a. Hittable a => AnyHittable a
+
+instance Hittable AnyHittable where
+  hit (AnyHittable a) = hit a

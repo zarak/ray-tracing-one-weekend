@@ -7,8 +7,6 @@ module MyLib (someFunc, rayColor, generateLine, randomScene) where
 import Camera
 import Color (Color (..), color, scaleColor, white, writeColor)
 import Control.Monad (forM, replicateM)
-import Control.Monad.Primitive
--- import Control.Parallel.Strategies (parBuffer, rdeepseq, rseq, withStrategy)
 import Data.Maybe (catMaybes)
 import Data.Text qualified as T
 import Data.Text.IO qualified as T (putStrLn)
@@ -63,7 +61,7 @@ camera =
     time0 = 0.0
     time1 = 1.0
 
-rayColor :: Ray -> GenIO -> Int -> World Sphere -> IO Color
+rayColor :: Ray -> GenIO -> Int -> World AnyHittable -> IO Color
 rayColor _ _ 0 _ = pure mempty
 rayColor r g depth world = do
   let unitDirection = unitVector r.direction
@@ -81,7 +79,7 @@ rayColor r g depth world = do
           c <- rayColor scattered.ray g (depth - 1) world
           pure $ Color $ scattered.attenuation.toVec3 * c.toVec3
 
-drawRay :: Int -> Int -> GenIO -> World Sphere -> IO Color
+drawRay :: Int -> Int -> GenIO -> World AnyHittable -> IO Color
 drawRay i j g world = do
   x <- randomDouble g
   y <- randomDouble g
@@ -91,7 +89,7 @@ drawRay i j g world = do
   pixelColor <- rayColor r g maximumDepth world
   pure pixelColor
 
-generateLine :: Int -> Gen (PrimState IO) -> World Sphere -> IO ()
+generateLine :: Int -> GenIO -> World AnyHittable -> IO ()
 generateLine j g world = do
   sampledColors <- forM [1 .. imageWidth] $ \i -> do
     cs <- replicateM samplesPerPixel $ drawRay i j g world
@@ -99,7 +97,7 @@ generateLine j g world = do
     pure $ writeColor summedColors samplesPerPixel
   T.putStrLn $ T.unlines sampledColors
 
-generateImage :: Int -> GenIO -> World Sphere -> IO ()
+generateImage :: Int -> GenIO -> World AnyHittable -> IO ()
 generateImage 0 _ _ = do
   hPutStr stderr "\rScanlines remaining: 0 \nDone.\n"
   hFlush stderr
@@ -117,10 +115,10 @@ someFunc = do
   world <- World <$> randomScene g
   generateImage imageHeight g world
 
-randomScene :: GenIO -> IO [Sphere]
+randomScene :: GenIO -> IO [AnyHittable]
 randomScene g = do
   let groundMaterial = lambertian (color 0.5 0.5 0.5)
-      largeSphere = Sphere (point 0 (-1000) 0) 1000 groundMaterial
+      largeSphere = AnyHittable (Sphere (point 0 (-1000) 0) 1000 groundMaterial)
 
   smallSpheres <-
     fmap catMaybes . sequence $
@@ -135,15 +133,15 @@ randomScene g = do
                     let material = lambertian (Color albedo)
                         -- center2 <- point3 <$> pure 0 <*> randomDoubleR 0 0.5 g <*> pure 0
                         center2 = Point $ Vec3 0 0 0
-                    pure $ Just (MovingSphere center center2 0.0 1.0 0.2 material)
+                    pure $ Just (AnyHittable $ MovingSphere center center2 0.0 1.0 0.2 material)
                   else
                     if chooseMat < 0.95
                       then do
                         albedo <- Color <$> uniformRM (0.5, 1) g
                         fuzz <- randomDoubleR 0 0.5 g
-                        pure $ Just (Sphere center 0.2 (metal albedo fuzz))
+                        pure $ Just (AnyHittable $ Sphere center 0.2 (metal albedo fuzz))
                       else do
-                        pure $ Just (Sphere center 0.2 (dielectric 1.5))
+                        pure $ Just (AnyHittable $ Sphere center 0.2 (dielectric 1.5))
               else pure Nothing
           | a <- [-11 .. 10 :: Int],
             b <- [-11 .. 10 :: Int]
@@ -151,10 +149,10 @@ randomScene g = do
       )
 
   let material1 = dielectric 1.5
-      sphere1 = Sphere (point 0 1 0) 1.0 material1
+      sphere1 = AnyHittable $ Sphere (point 0 1 0) 1.0 material1
   let material2 = lambertian (color 0.4 0.2 0.1)
-      sphere2 = Sphere (point (-4) 1 0) 1.0 material2
+      sphere2 = AnyHittable $ Sphere (point (-4) 1 0) 1.0 material2
   let material3 = metal (color 0.7 0.6 0.5) 0.0
-      sphere3 = Sphere (point 4 1 0) 1.0 material3
+      sphere3 = AnyHittable $ Sphere (point 4 1 0) 1.0 material3
 
   pure $ largeSphere : sphere1 : sphere2 : sphere3 : smallSpheres
