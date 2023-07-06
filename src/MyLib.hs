@@ -6,6 +6,7 @@ module MyLib (someFunc, rayColor, generateLine, randomScene) where
 
 import Camera
 import Color (Color (..), color, scaleColor, white, writeColor)
+import Control.Concurrent.Async (mapConcurrently)
 import Control.Monad (forM, replicateM)
 import Data.Maybe (catMaybes)
 import Data.Text qualified as T
@@ -79,8 +80,9 @@ rayColor r g depth world = do
           c <- rayColor scattered.ray g (depth - 1) world
           pure $ Color $ scattered.attenuation.toVec3 * c.toVec3
 
-drawRay :: Int -> Int -> GenIO -> World AnyHittable -> IO Color
-drawRay i j g world = do
+drawRay :: Int -> Int -> World AnyHittable -> IO Color
+drawRay i j world = do
+  g <- MWC.create
   x <- randomDouble g
   y <- randomDouble g
   let u = (fromIntegral i + x) / fromIntegral (imageWidth - 1)
@@ -89,23 +91,27 @@ drawRay i j g world = do
   pixelColor <- rayColor r g maximumDepth world
   pure pixelColor
 
-generateLine :: Int -> GenIO -> World AnyHittable -> IO ()
-generateLine j g world = do
-  sampledColors <- forM [1 .. imageWidth] $ \i -> do
-    cs <- replicateM samplesPerPixel $ drawRay i j g world
-    let summedColors = foldr (<>) mempty cs
-    pure $ writeColor summedColors samplesPerPixel
+generateLine :: Int -> World AnyHittable -> IO ()
+generateLine j world = do
+  sampledColors <-
+    mapConcurrently
+      ( \i -> do
+          cs <- replicateM samplesPerPixel $ drawRay i j world
+          let summedColors = foldr (<>) mempty cs
+          pure $ writeColor summedColors samplesPerPixel
+      )
+      [1 .. imageWidth]
   T.putStrLn $ T.unlines sampledColors
 
-generateImage :: Int -> GenIO -> World AnyHittable -> IO ()
-generateImage 0 _ _ = do
+generateImage :: Int -> World AnyHittable -> IO ()
+generateImage 0 _ = do
   hPutStr stderr "\rScanlines remaining: 0 \nDone.\n"
   hFlush stderr
-generateImage j g world = do
+generateImage j world = do
   hPutStr stderr ("\rScanlines remaining: " ++ show j ++ "\n")
   hFlush stderr
-  generateLine j g world
-  generateImage (j - 1) g world
+  generateLine j world
+  generateImage (j - 1) world
 
 someFunc :: IO ()
 someFunc = do
@@ -113,7 +119,7 @@ someFunc = do
   g <- MWC.create -- use for testing
   putStrLn $ printf "P3\n%d %d\n255" imageWidth imageHeight
   world <- World <$> randomScene g
-  generateImage imageHeight g world
+  generateImage imageHeight world
 
 randomScene :: GenIO -> IO [AnyHittable]
 randomScene g = do

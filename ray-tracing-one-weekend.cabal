@@ -42,6 +42,7 @@ library
                     , text-format
                     , deepseq
                     , parallel
+                    , async
     hs-source-dirs:   src
     default-language: GHC2021
 
