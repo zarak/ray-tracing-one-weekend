@@ -131,8 +131,8 @@ randomScene g = do
                   then do
                     albedo <- (*) <$> uniformM g <*> uniformM g
                     let material = lambertian (Color albedo)
-                        -- center2 <- point3 <$> pure 0 <*> randomDoubleR 0 0.5 g <*> pure 0
-                        center2 = Point $ Vec3 0 0 0
+                    x <- randomDoubleR 0 0.5 g
+                    let center2 = Point (Vec3 0 x 0 + center.toVec3)
                     pure $ Just (AnyHittable $ MovingSphere center center2 0.0 1.0 0.2 material)
                   else
                     if chooseMat < 0.95
