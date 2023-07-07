@@ -27,12 +27,16 @@ camera =
     aspectRatio
     aperture
     distToFocus
+    time0
+    time1
   where
     lookfrom = point 13 2 3
     lookat = Point zeros
     vup = Vec3 0 1 0
     distToFocus = 10.0
     aperture = 0.1
+    time0 = 0.0
+    time1 = 1.0
 
 main :: IO ()
 main = do
@@ -43,7 +47,7 @@ main = do
       v = fromIntegral j / fromIntegral (imageHeight - 1)
       i = imageWidth `div` 2
       j = imageHeight - 20
-      r = cameraRay camera u v randomInDisk
+  r <- cameraRay camera u v g
   defaultMain
     [ -- bench ("generateLine " <> show j) $ nfIO $ (`generateLine` g) j,
       bench "rayColor" $ nfIO $ rayColor r g maximumDepth world
