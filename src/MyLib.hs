@@ -7,7 +7,7 @@ module MyLib (someFunc, rayColor, generateLine, randomScene) where
 import Camera
 import Color (Color (..), color, scaleColor, white, writeColor)
 import Control.Concurrent.Async (mapConcurrently)
-import Control.Monad (forM, replicateM)
+import Control.Monad (replicateM)
 import Data.Maybe (catMaybes)
 import Data.Text qualified as T
 import Data.Text.IO qualified as T (putStrLn)
@@ -124,40 +124,50 @@ someFunc = do
 randomScene :: GenIO -> IO [AnyHittable]
 randomScene g = do
   let groundMaterial = lambertian (color 0.5 0.5 0.5)
-      largeSphere = AnyHittable (Sphere (point 0 (-1000) 0) 1000 groundMaterial)
+      largeSphere = AnyHittable (Sphere (point 0 -1000 0) 1000 groundMaterial)
 
   smallSpheres <-
     fmap catMaybes . sequence $
       ( [ do
             chooseMat <- randomDouble g
-            let center = point (fromIntegral a + 0.9 * chooseMat) 0.2 (fromIntegral b + 0.9 * chooseMat)
+            -- Generate the center point of each sphere
+            let center =
+                  point
+                    (fromIntegral a + 0.9 * chooseMat)
+                    0.2 -- y-value is fixed so that spheres are all at ground level (the same height)
+                    (fromIntegral b + 0.9 * chooseMat)
+            -- Proceed only if the small sphere is a certain distance away from
+            -- one of the larger spheres, otherwise skip.
             if Vec3.length (point 4 0.2 0 |-> center) > 0.9
               then do
-                if chooseMat < 0.8
+                if chooseMat < 0.8 -- Choose lambertian 80% of the time
                   then do
                     albedo <- (*) <$> uniformM g <*> uniformM g
                     let material = lambertian (Color albedo)
-                    x <- randomDoubleR 0 0.5 g
-                    let center2 = Point (Vec3 0 x 0 + center.toVec3)
+                    y <- randomDoubleR 0 0.5 g
+                    let center2 = Point (Vec3 0 y 0 + center.toVec3)
                     pure $ Just (AnyHittable $ MovingSphere center center2 0.0 1.0 0.2 material)
                   else
-                    if chooseMat < 0.95
+                    if chooseMat < 0.95 -- Chose metal 15% of the time
                       then do
                         albedo <- Color <$> uniformRM (0.5, 1) g
                         fuzz <- randomDoubleR 0 0.5 g
                         pure $ Just (AnyHittable $ Sphere center 0.2 (metal albedo fuzz))
-                      else do
+                      else -- Choose dieletric 5% of the time
+                      do
                         pure $ Just (AnyHittable $ Sphere center 0.2 (dielectric 1.5))
               else pure Nothing
-          | a <- [-11 .. 10 :: Int],
+          | -- Produce grid of small spheres
+            a <- [-11 .. 10 :: Int],
             b <- [-11 .. 10 :: Int]
         ]
       )
 
+  -- Three large spheres
   let material1 = dielectric 1.5
       sphere1 = AnyHittable $ Sphere (point 0 1 0) 1.0 material1
   let material2 = lambertian (color 0.4 0.2 0.1)
-      sphere2 = AnyHittable $ Sphere (point (-4) 1 0) 1.0 material2
+      sphere2 = AnyHittable $ Sphere (point -4 1 0) 1.0 material2
   let material3 = metal (color 0.7 0.6 0.5) 0.0
       sphere3 = AnyHittable $ Sphere (point 4 1 0) 1.0 material3
 
