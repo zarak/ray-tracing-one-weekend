@@ -1,3 +1,4 @@
+{-# LANGUAGE MultiWayIf #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 
 {-# HLINT ignore "Use fold" #-}
@@ -140,22 +141,13 @@ randomScene g = do
             -- one of the larger spheres, otherwise skip.
             if Vec3.length (point 4 0.2 0 |-> center) > 0.9
               then do
-                if chooseMat < 0.8 -- Choose lambertian 80% of the time
-                  then do
-                    albedo <- (*) <$> uniformM g <*> uniformM g
-                    let material = lambertian (Color albedo)
-                    y <- randomDoubleR 0 0.5 g
-                    let center2 = Point (Vec3 0 y 0 + center.toVec3)
-                    pure $ Just (AnyHittable $ MovingSphere center center2 0.0 1.0 0.2 material)
-                  else
-                    if chooseMat < 0.95 -- Chose metal 15% of the time
-                      then do
-                        albedo <- Color <$> uniformRM (0.5, 1) g
-                        fuzz <- randomDoubleR 0 0.5 g
-                        pure $ Just (AnyHittable $ Sphere center 0.2 (metal albedo fuzz))
-                      else -- Choose dieletric 5% of the time
-                      do
-                        pure $ Just (AnyHittable $ Sphere center 0.2 (dielectric 1.5))
+                if
+                    -- Choose lambertian 80% of the time
+                    | chooseMat < 0.8 -> createMovingAlbertian center g
+                    -- Chose metal 15% of the time
+                    | chooseMat < 0.95 -> createStaticMetal center g
+                    -- Choose dieletric 5% of the time
+                    | otherwise -> pure $ Just (AnyHittable $ Sphere center 0.2 (dielectric 1.5))
               else pure Nothing
           | -- Produce grid of small spheres
             a <- [-11 .. 10 :: Int],
@@ -172,3 +164,17 @@ randomScene g = do
       sphere3 = AnyHittable $ Sphere (point 4 1 0) 1.0 material3
 
   pure $ largeSphere : sphere1 : sphere2 : sphere3 : smallSpheres
+
+createMovingAlbertian :: Point -> GenIO -> IO (Maybe AnyHittable)
+createMovingAlbertian center g = do
+  albedo <- (*) <$> uniformM g <*> uniformM g
+  let material = lambertian (Color albedo)
+  y <- randomDoubleR 0 0.5 g
+  let center2 = Point (Vec3 0 y 0 + center.toVec3)
+  pure $ Just (AnyHittable $ MovingSphere center center2 0.0 1.0 0.2 material)
+
+createStaticMetal :: Point -> GenIO -> IO (Maybe AnyHittable)
+createStaticMetal center g = do
+  albedo <- Color <$> uniformRM (0.5, 1) g
+  fuzz <- randomDoubleR 0 0.5 g
+  pure $ Just (AnyHittable $ Sphere center 0.2 (metal albedo fuzz))
