@@ -136,3 +136,5 @@ mkWorld            MyLib     src/MyLib.hs:118:1-34              0.8    2.3    46
 uniformRM          Vec3      src/Vec3.hs:(47,3)-(51,21)         0.7    1.2    426 533407816
 metal              Material  src/Material.hs:(25,1)-(34,19)     0.4    1.3    252 571762984
 ```
+
+
