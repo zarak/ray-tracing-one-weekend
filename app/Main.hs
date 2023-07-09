@@ -10,7 +10,7 @@ import GHC.Generics
 import MyLib qualified (someFunc)
 import Options.Applicative
 
-data Options = Options
+data AppConfig = AppConfig
   { imageWidth :: Maybe Natural,
     samplesPerPixel :: Maybe Natural
   }
@@ -22,9 +22,9 @@ main = do
   print opts
   MyLib.someFunc
 
-optionsParser :: Parser Options
-optionsParser =
-  Options
+configParser :: Parser AppConfig
+configParser =
+  AppConfig
     <$> optional
       ( option
           auto
@@ -42,21 +42,21 @@ optionsParser =
           )
       )
 
-handleOptions :: IO Options
+handleOptions :: IO AppConfig
 handleOptions =
   execParser $
     info
-      (optionsParser <**> helper)
+      (configParser <**> helper)
       ( fullDesc
           <> progDesc "Ray tracer"
       )
 
-getOptions :: IO Options
+getOptions :: IO AppConfig
 getOptions = do
   opts <- handleOptions
   case opts of
-    Options Nothing Nothing -> defaultOptions
+    AppConfig Nothing Nothing -> defaultOptions
     _ -> pure opts
 
-defaultOptions :: IO Options
+defaultOptions :: IO AppConfig
 defaultOptions = Dhall.input Dhall.auto "./app/config.dhall"
