@@ -41,6 +41,7 @@
             jailbrokenThreadscope
             ghcid
             cabal-install
+            zlib
           ];
           inputsFrom = map (__getAttr "env") (__attrValues self.packages.${system});
         };

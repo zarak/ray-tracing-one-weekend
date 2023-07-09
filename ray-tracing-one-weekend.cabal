@@ -53,7 +53,9 @@ executable ray-tracing-one-weekend
     -- other-extensions:
     build-depends:
         base ^>=4.16.4.0,
-        ray-tracing-one-weekend
+        ray-tracing-one-weekend, 
+        optparse-applicative,
+        dhall
 
     hs-source-dirs:   app
     default-language: GHC2021
